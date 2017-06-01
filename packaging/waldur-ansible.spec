@@ -1,4 +1,5 @@
-Name: waldur-ansible
+Name: nodeconductor-ansible
+Provides: waldur-ansible
 Summary: Ansible plugin for Waldur
 Group: Development/Libraries
 Version: 0.1.0
