@@ -22,7 +22,8 @@ def get_playbook_path(instance, filename):
 
 @python_2_unicode_compatible
 class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
-    file = models.FileField(upload_to=get_playbook_path)
+    zip_file = models.FileField(upload_to=get_playbook_path)
+    entrypoint = models.CharField(max_length=255, help_text=_('The file to execute in a playbook.'))
 
     @staticmethod
     def get_url_name():

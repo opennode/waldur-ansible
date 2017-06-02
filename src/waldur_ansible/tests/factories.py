@@ -16,7 +16,8 @@ class PlaybookFactory(factory.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: 'playbook%s' % n)
     description = factory.Sequence(lambda n: 'Description %s' % n)
-    file = factory.django.FileField(filename='playbook.zip')
+    zip_file = factory.django.FileField(filename='playbook.zip')
+    entrypoint = 'main.yml'
 
     @factory.post_generation
     def parameters(self, create, extracted, **kwargs):

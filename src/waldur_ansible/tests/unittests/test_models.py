@@ -8,13 +8,13 @@ from ..factories import PlaybookFactory, PlaybookParameterFactory
 class PlaybookTest(TestCase):
     def test_file_is_renamed_after_upload(self):
         zip_file = ContentFile('file content', name='playbook.zip')
-        playbook = PlaybookFactory(file=zip_file)
-        self.assertNotEqual(zip_file.name, playbook.file.name)
+        playbook = PlaybookFactory(zip_file=zip_file)
+        self.assertNotEqual(zip_file.name, playbook.zip_file.name)
 
     def test_renamed_file_extension_is_zip(self):
         zip_file = ContentFile('file content', name='playbook.zip')
-        playbook = PlaybookFactory(file=zip_file)
-        self.assertTrue(playbook.file.name.endswith('.zip'))
+        playbook = PlaybookFactory(zip_file=zip_file)
+        self.assertTrue(playbook.zip_file.name.endswith('.zip'))
 
 
 class PlaybookParameterTest(TestCase):

@@ -77,13 +77,14 @@ class PlaybookPermissionsTest(APITransactionTestCase):
     def _get_valid_payload(self):
         temp_file = NamedTemporaryFile(suffix='.zip')
         zip_file = ZipFile(temp_file, 'w')
-        zip_file.writestr('playbook.yml', 'test')
+        zip_file.writestr('main.yml', 'test')
         zip_file.close()
         temp_file.seek(0)
 
         return {
             'name': 'test playbook',
-            'file': temp_file,
+            'zip_file': temp_file,
+            'entrypoint': 'main.yml',
             'parameters': [
                 {
                     'name': 'parameter1',
