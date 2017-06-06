@@ -6,13 +6,19 @@ import uuid
 from django.conf import settings
 from django.core import validators
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible, force_text
 from django.utils.translation import ugettext_lazy as _
+from django_fsm import transition, FSMIntegerField
+from model_utils.models import TimeStampedModel
 
+from nodeconductor.core.fields import JSONField
 from nodeconductor.core.models import NameMixin, DescribableMixin, UuidMixin
+from nodeconductor.structure.models import Project
+
+from .backend import AnsibleBackend
 
 
-def get_playbook_path(instance, filename):
+def get_archive_path(instance, filename):
     new_filename = '{uuid}.{extension}'.format(
         uuid=uuid.uuid4(),
         extension=filename.split('.')[-1]
@@ -22,12 +28,18 @@ def get_playbook_path(instance, filename):
 
 @python_2_unicode_compatible
 class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
-    zip_file = models.FileField(upload_to=get_playbook_path)
+    archive = models.FileField(upload_to=get_archive_path)
     entrypoint = models.CharField(max_length=255, help_text=_('The file to execute in a playbook.'))
 
     @staticmethod
     def get_url_name():
         return 'ansible_playbook'
+
+    def get_unpacked_archive_path(self):
+        return self.archive.path.rsplit('.', 1)[0]
+
+    def get_backend(self):
+        return AnsibleBackend(self)
 
     def __str__(self):
         return self.name
@@ -44,8 +56,70 @@ class PlaybookParameter(DescribableMixin, models.Model):
         help_text=_('Required. 255 characters or fewer. Letters, numbers and _ characters'),
     )
     playbook = models.ForeignKey(Playbook, on_delete=models.CASCADE, related_name='parameters')
-    is_required = models.BooleanField(default=False)
+    required = models.BooleanField(default=False)
     default = models.CharField(max_length=255, blank=True, help_text=_('Default argument for this parameter.'))
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model):
+    class Meta(object):
+        pass
+
+    class States(object):
+        OK = 1
+        ERRED = 2
+        RUNNING = 3
+        RUN_SCHEDULED = 4
+
+        CHOICES = (
+            (RUNNING, _('Running')),
+            (RUN_SCHEDULED, _('Run Scheduled')),
+            (OK, _('OK')),
+            (ERRED, _('Erred')),
+        )
+
+    class Permissions(object):
+        project_path = 'project'
+        customer_path = 'project__customer'
+
+    project = models.ForeignKey(Project, related_name='+')
+    playbook = models.ForeignKey(Playbook, related_name='jobs')
+    arguments = JSONField(default={}, blank=True, null=True)
+    output = models.TextField(blank=True)
+    state = FSMIntegerField(
+        default=States.OK,
+        choices=States.CHOICES,
+    )
+
+    @staticmethod
+    def get_url_name():
+        return 'ansible_job'
+
+    def get_backend(self):
+        return self.playbook.get_backend()
+
+    @transition(field=state, source=[States.OK, States.ERRED], target=States.RUN_SCHEDULED)
+    def schedule_running(self):
+        pass
+
+    @transition(field=state, source=States.RUN_SCHEDULED, target=States.RUNNING)
+    def begin_running(self):
+        pass
+
+    @transition(field=state, source=States.RUNNING, target=States.OK)
+    def set_ok(self):
+        pass
+
+    @transition(field=state, source='*', target=States.ERRED)
+    def set_erred(self):
+        pass
+
+    @property
+    def human_readable_state(self):
+        return force_text(dict(self.States.CHOICES)[self.state])
 
     def __str__(self):
         return self.name

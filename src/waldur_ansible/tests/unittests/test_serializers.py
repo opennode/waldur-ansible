@@ -1,8 +1,11 @@
+from __future__ import unicode_literals
+
 from zipfile import ZipFile
 
 from django.core.files.base import ContentFile
 from django.test import TestCase
 from rest_framework.serializers import ValidationError
+
 from waldur_ansible import serializers
 
 
@@ -18,30 +21,40 @@ class PlaybookSerializerTest(TestCase):
     def test_playbook_with_invalid_file_extension_should_fail(self):
         data = self._get_data(filename='playbook.invalid')
         serializer = serializers.PlaybookSerializer(data=data)
-        self.assertRaises(ValidationError, serializer.is_valid, raise_exception=True)
+
+        with self.assertRaises(ValidationError) as e:
+            serializer.is_valid(raise_exception=True)
+        self.assertEqual(e.exception.detail['archive'], ["File must have '.zip' extension."])
 
     def test_playbook_with_invalid_file_type_should_fail(self):
         data = self._get_data()
-        data['zip_file'] = ContentFile('content', name='playbook.zip')
+        data['archive'] = ContentFile('content', name='playbook.zip')
         serializer = serializers.PlaybookSerializer(data=data)
-        self.assertRaises(ValidationError, serializer.is_valid, raise_exception=True)
+
+        with self.assertRaises(ValidationError) as e:
+            serializer.is_valid(raise_exception=True)
+        self.assertEqual(e.exception.detail['archive'], ['ZIP file must be uploaded.'])
 
     def test_playbook_with_invalid_entrypoint_should_fail(self):
         data = self._get_data()
         data['entrypoint'] = 'invalid'
         serializer = serializers.PlaybookSerializer(data=data)
-        self.assertRaises(ValidationError, serializer.is_valid, raise_exception=True)
+
+        with self.assertRaises(ValidationError) as e:
+            serializer.is_valid(raise_exception=True)
+        self.assertEqual(e.exception.detail['non_field_errors'], ['Failed to find entrypoint %s in archive.' %
+                                                                  data['entrypoint']])
 
     def _get_data(self, filename='playbook.zip'):
         temp_file = ContentFile('file content', name=filename)
         zip_file = ZipFile(temp_file, 'w')
-        zip_file.writestr('main.yml', 'test')
+        zip_file.writestr('main.yml', 'test'.encode('utf8'))
         zip_file.close()
         temp_file.seek(0)
 
         return {
             'name': 'test playbook',
-            'zip_file': temp_file,
+            'archive': temp_file,
             'entrypoint': 'main.yml',
             'parameters': [
                 {

@@ -8,15 +8,15 @@ from celery import shared_task
 logger = logging.getLogger(__name__)
 
 
-@shared_task(name='waldur_ansible.tasks.delete_playbook')
-def delete_playbook(name, playbook_path):
+@shared_task(name='waldur_ansible.tasks.delete_playbook_archive')
+def delete_playbook_archive(archive_path):
     try:
-        os.remove(playbook_path)
+        os.remove(archive_path)
     except OSError as e:
         if e.errno == errno.ENOENT:
-            logger.info('Playbook %s stored in %s does not exist.', name, playbook_path)
+            logger.info('Playbook stored in %s does not exist.', archive_path)
         else:
-            logger.warning('Failed to delete playbook %s stored in %s.', name, playbook_path)
+            logger.warning('Failed to delete playbook stored in %s.', archive_path)
             raise
     else:
-        logger.info('Playbook %s stored in %s has been deleted.', name, playbook_path)
+        logger.info('Playbook stored in %s has been deleted.', archive_path)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-31 16:22+0000\n"
+"POT-Creation-Date: 2017-06-06 16:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,22 +17,69 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: src/waldur_ansible/admin.py:33 src/waldur_ansible/serializers.py:36
+
+#: admin.py:38 serializers.py:38
 msgid "ZIP file must be uploaded."
 msgstr ""
 
-#: src/waldur_ansible/admin.py:35 src/waldur_ansible/serializers.py:38
+#: admin.py:40 serializers.py:40
 msgid "File must have '.zip' extension."
 msgstr ""
 
-#: src/waldur_ansible/models.py:42
+#: admin.py:52 serializers.py:50
+#, python-format
+msgid "Failed to find entrypoint %s in archive."
+msgstr ""
+
+#: admin.py:91 serializers.py:103
+#, python-format
+msgid "Argument %s is not listed in playbook parameters."
+msgstr ""
+
+#: admin.py:94 serializers.py:106
+msgid "Not all required playbook parameters were specified."
+msgstr ""
+
+#: admin.py:115
+msgid "Execute"
+msgstr ""
+
+#: admin.py:120
+msgid "Job has to be OK or erred."
+msgstr ""
+
+#: models.py:32
+msgid "The file to execute in a playbook."
+msgstr ""
+
+#: models.py:55
 msgid "Enter a valid name."
 msgstr ""
 
-#: src/waldur_ansible/models.py:43
+#: models.py:56
 msgid "Required. 255 characters or fewer. Letters, numbers and _ characters"
 msgstr ""
 
-#: src/waldur_ansible/models.py:47
+#: models.py:60
 msgid "Default argument for this parameter."
+msgstr ""
+
+#: models.py:78
+msgid "Running"
+msgstr ""
+
+#: models.py:79
+msgid "Run Scheduled"
+msgstr ""
+
+#: models.py:80
+msgid "OK"
+msgstr ""
+
+#: models.py:81
+msgid "Erred"
+msgstr ""
+
+#: views.py:35
+msgid "Playbook job execution has been scheduled."
 msgstr ""

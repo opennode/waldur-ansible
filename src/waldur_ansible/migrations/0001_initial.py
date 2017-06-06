@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(blank=True, max_length=500, verbose_name='description')),
                 ('name', models.CharField(max_length=150, validators=[nodeconductor.core.validators.validate_name], verbose_name='name')),
                 ('uuid', nodeconductor.core.fields.UUIDField()),
-                ('file', models.FileField(upload_to=waldur_ansible.models.get_playbook_path)),
+                ('file', models.FileField(upload_to=waldur_ansible.models.get_archive_path)),
             ],
             options={
                 'abstract': False,
