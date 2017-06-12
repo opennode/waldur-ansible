@@ -1,9 +1,9 @@
 import json
 import logging
 import os
-import pickle
+import pickle  # nosec
 import six
-import subprocess
+import subprocess  # nosec
 
 from django.conf import settings
 
@@ -59,7 +59,7 @@ class AnsibleBackend(object):
 
         logger.debug('Executing command "%s".', command_str)
         try:
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT)  # nosec
         except subprocess.CalledProcessError as e:
             logger.info('Failed to execute command "%s".', command_str)
             job.output = e.output
