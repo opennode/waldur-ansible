@@ -17,7 +17,7 @@ class PlaybookPermissionsTest(APITransactionTestCase):
         self.playbook = factories.PlaybookFactory()
 
     def test_anonymous_user_cannot_retrieve_playbook(self):
-        response = self.client.get(factories.PlaybookFactory.get_list_url())
+        response = self.client.get(factories.PlaybookFactory.get_url(self.playbook))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @data('user', 'staff', 'global_support',
@@ -25,7 +25,7 @@ class PlaybookPermissionsTest(APITransactionTestCase):
           'admin', 'manager', 'project_support')
     def test_user_can_retrieve_playbook(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
-        response = self.client.get(factories.PlaybookFactory.get_list_url())
+        response = self.client.get(factories.PlaybookFactory.get_url(self.playbook))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_staff_user_can_create_playbook(self):
@@ -77,13 +77,14 @@ class PlaybookPermissionsTest(APITransactionTestCase):
     def _get_valid_payload(self):
         temp_file = NamedTemporaryFile(suffix='.zip')
         zip_file = ZipFile(temp_file, 'w')
-        zip_file.writestr('playbook.yml', 'test')
+        zip_file.writestr('main.yml', 'test')
         zip_file.close()
         temp_file.seek(0)
 
         return {
             'name': 'test playbook',
-            'file': temp_file,
+            'archive': temp_file,
+            'entrypoint': 'main.yml',
             'parameters': [
                 {
                     'name': 'parameter1',

@@ -1,22 +1,22 @@
 import errno
 import logging
-import os
+from shutil import rmtree
 
 from celery import shared_task
-
 
 logger = logging.getLogger(__name__)
 
 
-@shared_task(name='waldur_ansible.tasks.delete_playbook')
-def delete_playbook(name, playbook_path):
+@shared_task(name='waldur_ansible.tasks.delete_playbook_workspace')
+def delete_playbook_workspace(workspace_path):
+    logger.debug('Deleting playbook workspace %s.', workspace_path)
     try:
-        os.remove(playbook_path)
+        rmtree(workspace_path)
     except OSError as e:
         if e.errno == errno.ENOENT:
-            logger.info('Playbook %s stored in %s does not exist.', name, playbook_path)
+            logger.info('Playbook workspace %s does not exist.', workspace_path)
         else:
-            logger.warning('Failed to delete playbook %s stored in %s.', name, playbook_path)
+            logger.warning('Failed to delete playbook workspace %s.', workspace_path)
             raise
     else:
-        logger.info('Playbook %s stored in %s has been deleted.', name, playbook_path)
+        logger.info('Playbook workspace %s has been deleted.', workspace_path)

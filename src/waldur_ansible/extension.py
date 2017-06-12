@@ -6,7 +6,9 @@ class AnsibleExtension(NodeConductorExtension):
     class Settings:
         WALDUR_ANSIBLE = {
             'PLAYBOOKS_DIR_NAME': 'ansible_playbooks',
-            'PRESERVE_PLAYBOOKS_AFTER_DELETION': False,
+            'PRESERVE_PLAYBOOK_ARCHIVE_AFTER_DELETION': False,
+            'PLAYBOOK_EXECUTION_COMMAND': 'ansible-playbook',
+            'PLAYBOOK_ARGUMENTS': ['-i', '"localhost,"', '-c', 'local'],
         }
 
     @staticmethod

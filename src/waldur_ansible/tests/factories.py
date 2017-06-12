@@ -6,6 +6,7 @@ from rest_framework.reverse import reverse
 
 from nodeconductor.core.utils import get_detail_view_name, get_list_view_name
 from nodeconductor.structure import models
+from nodeconductor.structure.tests import factories as structure_factories
 
 from .. import models
 
@@ -16,7 +17,8 @@ class PlaybookFactory(factory.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: 'playbook%s' % n)
     description = factory.Sequence(lambda n: 'Description %s' % n)
-    file = factory.django.FileField(filename='playbook.zip')
+    workspace = factory.Sequence(lambda n: '/path/to/workspace%s' % n)
+    entrypoint = 'main.yml'
 
     @factory.post_generation
     def parameters(self, create, extracted, **kwargs):
@@ -51,3 +53,36 @@ class PlaybookParameterFactory(factory.DjangoModelFactory):
     description = factory.Sequence(lambda n: 'Description %s' % n)
     default = factory.Sequence(lambda n: 'Value%s' % n)
 
+
+class JobFactory(factory.DjangoModelFactory):
+    class Meta(object):
+        model = models.Job
+
+    name = factory.Sequence(lambda n: 'job%s' % n)
+    description = factory.Sequence(lambda n: 'Description %s' % n)
+    playbook = factory.SubFactory(PlaybookFactory)
+    project = factory.SubFactory(structure_factories.ProjectFactory)
+
+    @factory.post_generation
+    def arguments(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            self.arguments = extracted
+        else:
+            self.arguments = {name: 'test value' for name in
+                              self.playbook.parameters.all().values_list('name', flat=True)}
+        self.save(update_fields=['arguments'])
+
+    @classmethod
+    def get_url(cls, job=None, action=None):
+        if job is None:
+            job = JobFactory()
+
+        url = 'http://testserver' + reverse(get_detail_view_name(models.Job), kwargs={'uuid': job.uuid})
+        return url if action is None else url + action + '/'
+
+    @classmethod
+    def get_list_url(cls):
+        return 'http://testserver' + reverse(get_list_view_name(models.Job))
