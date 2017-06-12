@@ -42,8 +42,8 @@ class PlaybookSerializerTest(TestCase):
 
         with self.assertRaises(ValidationError) as e:
             serializer.is_valid(raise_exception=True)
-        self.assertEqual(e.exception.detail['non_field_errors'], ['Failed to find entrypoint %s in archive.' %
-                                                                  data['entrypoint']])
+        self.assertEqual(e.exception.detail['non_field_errors'],
+                         ['Failed to find entrypoint %s in archive %s.' % (data['entrypoint'], data['archive'].name)])
 
     def _get_data(self, filename='playbook.zip'):
         temp_file = ContentFile('file content', name=filename)
