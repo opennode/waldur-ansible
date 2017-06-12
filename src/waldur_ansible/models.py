@@ -18,25 +18,26 @@ from nodeconductor.structure.models import Project
 from .backend import AnsibleBackend
 
 
-def get_archive_path(instance, filename):
-    new_filename = '{uuid}.{extension}'.format(
-        uuid=uuid.uuid4(),
-        extension=filename.split('.')[-1]
-    )
-    return os.path.join(settings.WALDUR_ANSIBLE.get('PLAYBOOKS_DIR_NAME', 'ansible_playbooks'), new_filename)
-
-
 @python_2_unicode_compatible
 class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
-    archive = models.FileField(upload_to=get_archive_path)
-    entrypoint = models.CharField(max_length=255, help_text=_('The file to execute in a playbook.'))
+    workspace = models.CharField(max_length=255, unique=True, help_text=_('Absolute path to the playbook workspace.'))
+    entrypoint = models.CharField(max_length=255, help_text=_('Relative path to the file in the workspace to execute.'))
 
     @staticmethod
     def get_url_name():
         return 'ansible_playbook'
 
-    def get_unpacked_archive_path(self):
-        return self.archive.path.rsplit('.', 1)[0]
+    @staticmethod
+    def generate_workspace_path():
+        base_path = os.path.join(
+            settings.MEDIA_ROOT,
+            settings.WALDUR_ANSIBLE.get('PLAYBOOKS_DIR_NAME', 'ansible_playbooks'),
+        )
+        path = os.path.join(base_path, uuid.uuid4().hex)
+        while os.path.exists(path):
+            path = os.path.join(base_path, uuid.uuid4().hex)
+
+        return path
 
     def get_backend(self):
         return AnsibleBackend(self)

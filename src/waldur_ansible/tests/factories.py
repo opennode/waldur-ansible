@@ -17,7 +17,7 @@ class PlaybookFactory(factory.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: 'playbook%s' % n)
     description = factory.Sequence(lambda n: 'Description %s' % n)
-    archive = factory.django.FileField(filename='playbook.zip')
+    workspace = factory.Sequence(lambda n: '/path/to/workspace%s' % n)
     entrypoint = 'main.yml'
 
     @factory.post_generation

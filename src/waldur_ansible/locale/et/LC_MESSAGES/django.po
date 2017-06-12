@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-06 16:38+0000\n"
+"POT-Creation-Date: 2017-06-12 08:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,65 +18,74 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:38 serializers.py:38
+#: admin.py:50 serializers.py:39
 msgid "ZIP file must be uploaded."
 msgstr ""
 
-#: admin.py:40 serializers.py:40
+#: admin.py:52 serializers.py:41
 msgid "File must have '.zip' extension."
 msgstr ""
 
-#: admin.py:52 serializers.py:50
-#, python-format
-msgid "Failed to find entrypoint %s in archive."
+#: admin.py:58 serializers.py:47
+#, python-brace-format
+msgid "File {filename} in archive {archive_name} has an invalid type."
 msgstr ""
 
-#: admin.py:91 serializers.py:103
+#: admin.py:74 serializers.py:60
+#, python-brace-format
+msgid "Failed to find entrypoint {entrypoint} in archive {archive_name}."
+msgstr ""
+
+#: admin.py:129 serializers.py:120
 #, python-format
 msgid "Argument %s is not listed in playbook parameters."
 msgstr ""
 
-#: admin.py:94 serializers.py:106
+#: admin.py:132 serializers.py:123
 msgid "Not all required playbook parameters were specified."
 msgstr ""
 
-#: admin.py:115
+#: admin.py:163
 msgid "Execute"
 msgstr ""
 
-#: admin.py:120
+#: admin.py:168
 msgid "Job has to be OK or erred."
 msgstr ""
 
-#: models.py:32
-msgid "The file to execute in a playbook."
+#: models.py:23
+msgid "Absolute path to the playbook workspace."
 msgstr ""
 
-#: models.py:55
-msgid "Enter a valid name."
+#: models.py:24
+msgid "Relative path to the file in the workspace to execute."
 msgstr ""
 
 #: models.py:56
+msgid "Enter a valid name."
+msgstr ""
+
+#: models.py:57
 msgid "Required. 255 characters or fewer. Letters, numbers and _ characters"
 msgstr ""
 
-#: models.py:60
+#: models.py:61
 msgid "Default argument for this parameter."
 msgstr ""
 
-#: models.py:78
+#: models.py:79
 msgid "Running"
 msgstr ""
 
-#: models.py:79
+#: models.py:80
 msgid "Run Scheduled"
 msgstr ""
 
-#: models.py:80
+#: models.py:81
 msgid "OK"
 msgstr ""
 
-#: models.py:81
+#: models.py:82
 msgid "Erred"
 msgstr ""
 

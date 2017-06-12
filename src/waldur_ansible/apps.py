@@ -12,7 +12,7 @@ class AnsibleConfig(AppConfig):
         Playbook = self.get_model('Playbook')
 
         signals.pre_delete.connect(
-            handlers.cleanup_playbook_archive,
+            handlers.delete_playbook_workspace,
             sender=Playbook,
-            dispatch_uid='waldur_ansible.handlers.cleanup_playbook_archive',
+            dispatch_uid='waldur_ansible.handlers.delete_playbook_workspace',
         )

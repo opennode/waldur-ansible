@@ -23,12 +23,13 @@ class PlaybookParameterSerializer(serializers.ModelSerializer):
 
 
 class PlaybookSerializer(AugmentedSerializerMixin, serializers.HyperlinkedModelSerializer):
+    archive = serializers.FileField(write_only=True)
     parameters = PlaybookParameterSerializer(many=True)
 
     class Meta(object):
         model = models.Playbook
         fields = ('url', 'uuid', 'name', 'description', 'archive', 'entrypoint', 'parameters')
-        protected_fields = ('archive', 'entrypoint', 'parameters')
+        protected_fields = ('entrypoint', 'parameters', 'archive')
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
         }
@@ -38,6 +39,14 @@ class PlaybookSerializer(AugmentedSerializerMixin, serializers.HyperlinkedModelS
             raise serializers.ValidationError(_('ZIP file must be uploaded.'))
         elif not value.name.endswith('.zip'):
             raise serializers.ValidationError(_("File must have '.zip' extension."))
+
+        zip_file = ZipFile(value)
+        invalid_file = zip_file.testzip()
+        if invalid_file is not None:
+            raise serializers.ValidationError(
+                _('File {filename} in archive {archive_name} has an invalid type.'.format(
+                    filename=invalid_file, archive_name=zip_file.filename)))
+
         return value
 
     def validate(self, attrs):
@@ -47,13 +56,21 @@ class PlaybookSerializer(AugmentedSerializerMixin, serializers.HyperlinkedModelS
         zip_file = ZipFile(attrs['archive'])
         entrypoint = attrs['entrypoint']
         if entrypoint not in zip_file.namelist():
-            raise serializers.ValidationError(_('Failed to find entrypoint %s in archive.' % entrypoint))
+            raise serializers.ValidationError(
+                _('Failed to find entrypoint {entrypoint} in archive {archive_name}.'.format(
+                    entrypoint=entrypoint, archive_name=zip_file.filename)))
 
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
         parameters_data = validated_data.pop('parameters')
+        archive = validated_data.pop('archive')
+        validated_data['workspace'] = models.Playbook.generate_workspace_path()
+
+        zip_file = ZipFile(archive)
+        zip_file.extractall(validated_data['workspace'])
+        zip_file.close()
 
         playbook = models.Playbook.objects.create(**validated_data)
         for parameter_data in parameters_data:
@@ -99,7 +116,7 @@ class JobSerializer(AugmentedSerializerMixin, PermissionFieldFilteringMixin, ser
         arguments = attrs['arguments']
         parameter_names = playbook.parameters.all().values_list('name', flat=True)
         for argument in arguments.keys():
-            if argument not in parameter_names:
+            if argument not in parameter_names and argument != 'project_uuid':
                 raise serializers.ValidationError(_('Argument %s is not listed in playbook parameters.' % argument))
 
         if playbook.parameters.exclude(name__in=arguments.keys()).filter(required=True, default__exact='').exists():
@@ -109,6 +126,20 @@ class JobSerializer(AugmentedSerializerMixin, PermissionFieldFilteringMixin, ser
 
     def get_filtered_field_names(self):
         return 'project',
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        arguments = validated_data['arguments']
+        playbook = instance.playbook
+        unfilled_parameters = playbook.parameters.exclude(name__in=arguments.keys())
+        for parameter in unfilled_parameters:
+            if parameter.default:
+                arguments[parameter.name] = parameter.default
+
+        project = instance.project
+        arguments['project_uuid'] = project.uuid.hex
+
+        return super(JobSerializer, self).update(instance, validated_data)
 
     @transaction.atomic
     def create(self, validated_data):

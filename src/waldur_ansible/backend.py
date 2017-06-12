@@ -1,13 +1,9 @@
-import errno
 import json
 import logging
 import os
 import pickle
 import six
 import subprocess
-
-from shutil import rmtree
-from zipfile import ZipFile, BadZipfile
 
 from django.conf import settings
 
@@ -43,22 +39,10 @@ class AnsibleBackend(object):
     def __init__(self, playbook):
         self.playbook = playbook
 
-    def unpack_playbook(self):
-        logger.debug('Unpacking playbook stored in %s.', self.playbook.archive.path)
-        try:
-            zip_file = ZipFile(self.playbook.archive.path)
-            zip_file.extractall(self.playbook.get_unpacked_archive_path())
-            zip_file.close()
-        except BadZipfile as e:
-            logger.info('Failed to unpack zip file %s.', self.playbook.archive.path)
-            six.reraise(AnsibleBackendError, e)
-        else:
-            logger.info('Playbook stored in %s has been unpacked.', self.playbook.archive.path)
-
     def _get_command(self, job):
-        playbook_path = os.path.join(self.playbook.get_unpacked_archive_path(), self.playbook.entrypoint)
+        playbook_path = os.path.join(self.playbook.workspace, self.playbook.entrypoint)
         if not os.path.exists(playbook_path):
-            raise AnsibleBackendError('Playbook %s does not exist.', playbook_path)
+            raise AnsibleBackendError('Playbook %s does not exist.' % playbook_path)
 
         command = [settings.WALDUR_ANSIBLE.get('PLAYBOOK_EXECUTION_COMMAND', 'ansible-playbook')]
         if settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'):
@@ -85,17 +69,3 @@ class AnsibleBackend(object):
             logger.info('Command "%s" was successfully executed.', command_str)
             job.output = output
             job.save(update_fields=['output'])
-
-    def delete_playbook(self):
-        playbook_path = self.playbook.get_unpacked_archive_path()
-        logger.debug('Deleting playbook stored in %s.', playbook_path)
-        try:
-            rmtree(playbook_path)
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                logger.warning('Playbook %s does not exist.', playbook_path)
-            else:
-                logger.warning('Failed to delete playbook stored in %s.', playbook_path)
-                six.reraise(AnsibleBackendError, e)
-        else:
-            logger.info('Playbook stored in %s has been deleted.', playbook_path)
