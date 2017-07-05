@@ -1,5 +1,4 @@
-Name: nodeconductor-ansible
-Provides: waldur-ansible
+Name: waldur-ansible
 Summary: Ansible plugin for Waldur
 Group: Development/Libraries
 Version: 0.1.0
@@ -8,13 +7,12 @@ License: MIT
 Url: http://nodeconductor.com
 Source0: %{name}-%{version}.tar.gz
 
-Requires: nodeconductor > 0.140.1
+Requires: waldur-core > 0.140.1
 
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 BuildRequires: python-setuptools
-
 
 %description
 Ansible plugin for Waldur.
@@ -23,7 +21,7 @@ Ansible plugin for Waldur.
 %setup -q -n %{name}-%{version}
 
 %build
-python setup.py build
+%{__python} setup.py build
 
 %install
 rm -rf %{buildroot}
