@@ -106,7 +106,7 @@ class JobSerializer(AugmentedSerializerMixin,
                   'playbook', 'playbook_name', 'playbook_uuid',
                   'arguments', 'state', 'output', 'created', 'modified')
         read_only_fields = ('output', 'created', 'modified')
-        protected_fields = ('project', 'playbook')
+        protected_fields = ('project', 'playbook', 'arguments')
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
         }
