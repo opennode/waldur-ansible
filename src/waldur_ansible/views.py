@@ -10,7 +10,7 @@ from nodeconductor.structure.filters import GenericRoleFilter
 from nodeconductor.structure.metadata import ActionsMetadata
 from nodeconductor.structure.permissions import is_staff, is_manager
 
-from . import models, serializers, executors
+from . import filters, models, serializers, executors
 
 
 class PlaybookViewSet(ActionsViewSet):
@@ -24,6 +24,7 @@ class JobViewSet(ActionsViewSet):
     lookup_field = 'uuid'
     queryset = models.Job.objects.all().order_by('pk')
     filter_backends = (GenericRoleFilter, DjangoFilterBackend)
+    filter_class = filters.AnsibleJobsFilter
     unsafe_methods_permissions = [is_manager]
     serializer_class = serializers.JobSerializer
     metadata_class = ActionsMetadata

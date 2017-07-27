@@ -79,23 +79,31 @@ class PlaybookSerializer(AugmentedSerializerMixin, serializers.HyperlinkedModelS
         return playbook
 
 
-class JobSerializer(AugmentedSerializerMixin, PermissionFieldFilteringMixin, serializers.HyperlinkedModelSerializer):
+class JobSerializer(AugmentedSerializerMixin,
+                    PermissionFieldFilteringMixin,
+                    serializers.HyperlinkedModelSerializer):
     project = serializers.HyperlinkedRelatedField(
         lookup_field='uuid',
         view_name='project-detail',
         queryset=models.Project.objects.all(),
     )
+    project_name = serializers.ReadOnlyField(source='project.name')
+    project_uuid = serializers.ReadOnlyField(source='project.uuid')
     playbook = serializers.HyperlinkedRelatedField(
         lookup_field='uuid',
         view_name=get_detail_view_name(models.Playbook),
         queryset=models.Playbook.objects.all(),
     )
+    playbook_name = serializers.ReadOnlyField(source='playbook.name')
+    playbook_uuid = serializers.ReadOnlyField(source='playbook.uuid')
     arguments = JSONField(default={})
     state = serializers.SerializerMethodField()
 
     class Meta(object):
         model = models.Job
-        fields = ('url', 'uuid', 'name', 'description', 'project', 'playbook',
+        fields = ('url', 'uuid', 'name', 'description',
+                  'project', 'project_name', 'project_uuid',
+                  'playbook', 'playbook_name', 'playbook_uuid',
                   'arguments', 'state', 'output', 'created', 'modified')
         read_only_fields = ('output', 'created', 'modified')
         protected_fields = ('project', 'playbook')
