@@ -50,6 +50,7 @@ class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
 class PlaybookParameter(DescribableMixin, models.Model):
     class Meta(object):
         unique_together = ('playbook', 'name')
+        ordering = ['order']
 
     name = models.CharField(
         max_length=255,
@@ -59,6 +60,7 @@ class PlaybookParameter(DescribableMixin, models.Model):
     playbook = models.ForeignKey(Playbook, on_delete=models.CASCADE, related_name='parameters')
     required = models.BooleanField(default=False)
     default = models.CharField(max_length=255, blank=True, help_text=_('Default argument for this parameter.'))
+    order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
