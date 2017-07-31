@@ -58,8 +58,9 @@ class AnsibleBackend(object):
         command_str = ' '.join(command)
 
         logger.debug('Executing command "%s".', command_str)
+        env = dict(os.environ, ANSIBLE_LIBRARY=settings.WALDUR_ANSIBLE['ANSIBLE_LIBRARY'])
         try:
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT)  # nosec
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, env=env)  # nosec
         except subprocess.CalledProcessError as e:
             logger.info('Failed to execute command "%s".', command_str)
             job.output = e.output

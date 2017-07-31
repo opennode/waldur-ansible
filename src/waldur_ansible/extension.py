@@ -8,7 +8,8 @@ class AnsibleExtension(NodeConductorExtension):
             'PLAYBOOKS_DIR_NAME': 'ansible_playbooks',
             'PRESERVE_PLAYBOOK_ARCHIVE_AFTER_DELETION': False,
             'PLAYBOOK_EXECUTION_COMMAND': 'ansible-playbook',
-            'PLAYBOOK_ARGUMENTS': ['-i', '"localhost,"', '-c', 'local'],
+            'PLAYBOOK_ARGUMENTS': ['--verbose'],
+            'ANSIBLE_LIBRARY': '/usr/share/ansible/',
         }
 
     @staticmethod

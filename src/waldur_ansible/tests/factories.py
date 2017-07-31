@@ -58,6 +58,7 @@ class JobFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = models.Job
 
+    state = models.Job.States.OK
     name = factory.Sequence(lambda n: 'job%s' % n)
     description = factory.Sequence(lambda n: 'Description %s' % n)
     playbook = factory.SubFactory(PlaybookFactory)
