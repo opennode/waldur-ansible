@@ -37,7 +37,3 @@ rm -rf %{buildroot}
 %changelog
 * Tue Jul 25 2017 Jenkins <jenkins@opennodecloud.com> - 0.1.0-1.el7
 - New upstream release
-
-* Mon May 29 2017 Dmitri Tsumak <dmitri@opennodecloud.com> - 0.1.0-1.el7
-- Initial version of the package
-
