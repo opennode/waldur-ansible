@@ -72,14 +72,14 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
         pass
 
     class States(object):
-        OK = 1
-        ERRED = 2
-        RUNNING = 3
-        RUN_SCHEDULED = 4
+        SCHEDULED = 1
+        EXECUTING = 2
+        OK = 3
+        ERRED = 4
 
         CHOICES = (
-            (RUNNING, _('Running')),
-            (RUN_SCHEDULED, _('Run Scheduled')),
+            (SCHEDULED, _('Scheduled')),
+            (EXECUTING, _('Executing')),
             (OK, _('OK')),
             (ERRED, _('Erred')),
         )
@@ -93,7 +93,7 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
     arguments = JSONField(default={}, blank=True, null=True)
     output = models.TextField(blank=True)
     state = FSMIntegerField(
-        default=States.OK,
+        default=States.SCHEDULED,
         choices=States.CHOICES,
     )
 
@@ -104,19 +104,15 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
     def get_backend(self):
         return self.playbook.get_backend()
 
-    @transition(field=state, source=[States.OK, States.ERRED], target=States.RUN_SCHEDULED)
-    def schedule_running(self):
+    @transition(field=state, source=States.SCHEDULED, target=States.EXECUTING)
+    def begin_executing(self):
         pass
 
-    @transition(field=state, source=States.RUN_SCHEDULED, target=States.RUNNING)
-    def begin_running(self):
-        pass
-
-    @transition(field=state, source=States.RUNNING, target=States.OK)
+    @transition(field=state, source=States.EXECUTING, target=States.OK)
     def set_ok(self):
         pass
 
-    @transition(field=state, source='*', target=States.ERRED)
+    @transition(field=state, source=States.EXECUTING, target=States.ERRED)
     def set_erred(self):
         pass
 

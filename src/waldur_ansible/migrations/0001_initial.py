@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('uuid', nodeconductor.core.fields.UUIDField()),
                 ('arguments', nodeconductor.core.fields.JSONField(blank=True, default={}, null=True)),
                 ('output', models.TextField(blank=True)),
-                ('state', django_fsm.FSMIntegerField(choices=[(3, 'Running'), (4, 'Run Scheduled'), (1, 'OK'), (2, 'Erred')], default=1)),
+                ('state', django_fsm.FSMIntegerField(choices=[(1, 'Scheduled'), (2, 'Executing'), (3, 'OK'), (4, 'Erred')], default=1)),
             ],
         ),
         migrations.CreateModel(
