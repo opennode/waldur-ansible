@@ -9,7 +9,7 @@ class AnsibleExtension(NodeConductorExtension):
             'PRESERVE_PLAYBOOK_ARCHIVE_AFTER_DELETION': False,
             'PLAYBOOK_EXECUTION_COMMAND': 'ansible-playbook',
             'PLAYBOOK_ARGUMENTS': ['--verbose'],
-            'ANSIBLE_LIBRARY': '/usr/share/ansible/',
+            'ANSIBLE_LIBRARY': '/usr/share/ansible-waldur/',
         }
 
     @staticmethod
