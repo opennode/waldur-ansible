@@ -49,11 +49,9 @@ class AnsibleBackend(object):
             command.extend(settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'))
         if job.arguments:
             # XXX: Passing arguments in following way is supported in Ansible>=1.2
-            command.extend([
-                '--extra-vars', json.dumps(job.arguments),
-                '--ssh-common-args', '-o UserKnownHostsFile=/dev/null',
-            ])
+            command.extend(['--extra-vars', json.dumps(job.arguments)])
 
+        command.extend(['--ssh-common-args', '-o UserKnownHostsFile=/dev/null'])
         return command + [playbook_path]
 
     def run_job(self, job):
