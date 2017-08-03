@@ -49,7 +49,10 @@ class AnsibleBackend(object):
             command.extend(settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'))
         if job.arguments:
             # XXX: Passing arguments in following way is supported in Ansible>=1.2
-            command.extend(['--extra-vars', json.dumps(job.arguments)])
+            command.extend([
+                '--extra-vars', json.dumps(job.arguments),
+                '--ssh-common-args', '-o UserKnownHostsFile=/dev/null',
+            ])
 
         return command + [playbook_path]
 
@@ -58,7 +61,11 @@ class AnsibleBackend(object):
         command_str = ' '.join(command)
 
         logger.debug('Executing command "%s".', command_str)
-        env = dict(os.environ, ANSIBLE_LIBRARY=settings.WALDUR_ANSIBLE['ANSIBLE_LIBRARY'])
+        env = dict(
+            os.environ,
+            ANSIBLE_LIBRARY=settings.WALDUR_ANSIBLE['ANSIBLE_LIBRARY'],
+            ANSIBLE_HOST_KEY_CHECKING='False',
+        )
         try:
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, env=env)  # nosec
         except subprocess.CalledProcessError as e:
