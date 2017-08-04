@@ -34,7 +34,7 @@ class AddPlaybookParameterInline(admin.TabularInline):
 class ChangePlaybookAdminForm(forms.ModelForm):
     class Meta:
         model = models.Playbook
-        fields = ('name', 'description', 'entrypoint')
+        fields = ('name', 'description', 'entrypoint', 'image')
 
 
 class AddPlaybookAdminForm(forms.ModelForm):
@@ -42,7 +42,7 @@ class AddPlaybookAdminForm(forms.ModelForm):
 
     class Meta:
         model = models.Playbook
-        fields = ('name', 'description', 'entrypoint')
+        fields = ('name', 'description', 'entrypoint', 'image')
 
     def clean_archive(self):
         value = self.cleaned_data['archive']

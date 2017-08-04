@@ -28,7 +28,7 @@ class PlaybookSerializer(AugmentedSerializerMixin, serializers.HyperlinkedModelS
 
     class Meta(object):
         model = models.Playbook
-        fields = ('url', 'uuid', 'name', 'description', 'archive', 'entrypoint', 'parameters')
+        fields = ('url', 'uuid', 'name', 'description', 'archive', 'entrypoint', 'parameters', 'image')
         protected_fields = ('entrypoint', 'parameters', 'archive')
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
