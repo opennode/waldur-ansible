@@ -34,7 +34,7 @@ class AddPlaybookParameterInline(admin.TabularInline):
 class ChangePlaybookAdminForm(forms.ModelForm):
     class Meta:
         model = models.Playbook
-        fields = ('name', 'description', 'entrypoint')
+        fields = ('name', 'description', 'entrypoint', 'image')
 
 
 class AddPlaybookAdminForm(forms.ModelForm):

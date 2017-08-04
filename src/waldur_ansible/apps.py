@@ -16,3 +16,9 @@ class AnsibleConfig(AppConfig):
             sender=Playbook,
             dispatch_uid='waldur_ansible.handlers.delete_playbook_workspace',
         )
+
+        signals.pre_save.connect(
+            handlers.resize_playbook_image,
+            sender=Playbook,
+            dispatch_uid='waldur_ansible.handlers.resize_playbook_image',
+        )

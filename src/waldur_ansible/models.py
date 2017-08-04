@@ -9,6 +9,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible, force_text
 from django.utils.translation import ugettext_lazy as _
 from django_fsm import transition, FSMIntegerField
+from model_utils import FieldTracker
 from model_utils.models import TimeStampedModel
 
 from nodeconductor.core.fields import JSONField
@@ -18,10 +19,16 @@ from nodeconductor.structure.models import Project
 from .backend import AnsibleBackend
 
 
+def get_upload_path(instance, filename):
+    return '%s/%s.png' % (instance._meta.model_name, instance.uuid.hex)
+
+
 @python_2_unicode_compatible
 class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
     workspace = models.CharField(max_length=255, unique=True, help_text=_('Absolute path to the playbook workspace.'))
     entrypoint = models.CharField(max_length=255, help_text=_('Relative path to the file in the workspace to execute.'))
+    image = models.ImageField(upload_to=get_upload_path, null=True, blank=True)
+    tracker = FieldTracker()
 
     @staticmethod
     def get_url_name():

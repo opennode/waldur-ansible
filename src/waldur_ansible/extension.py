@@ -10,6 +10,7 @@ class AnsibleExtension(NodeConductorExtension):
             'PLAYBOOK_EXECUTION_COMMAND': 'ansible-playbook',
             'PLAYBOOK_ARGUMENTS': ['--verbose'],
             'ANSIBLE_LIBRARY': '/usr/share/ansible-waldur/',
+            'PLAYBOOK_ICON_SIZE': (64, 64),
         }
 
     @staticmethod
