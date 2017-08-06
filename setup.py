@@ -18,7 +18,7 @@ setup(
     version='0.1.0',
     author='OpenNode Team',
     author_email='info@opennodecloud.com',
-    url='http://nodeconductor.com',
+    url='https://waldur.com',
     description='Waldur plugin for Ansible playbooks management and execution.',
     long_description=open('README.rst').read(),
     package_dir={'': 'src'},
