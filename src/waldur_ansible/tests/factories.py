@@ -7,6 +7,7 @@ from rest_framework.reverse import reverse
 from nodeconductor.core.utils import get_detail_view_name, get_list_view_name
 from nodeconductor.structure import models
 from nodeconductor.structure.tests import factories as structure_factories
+from nodeconductor_openstack.openstack_tenant.tests import factories as openstack_factories
 
 from .. import models
 
@@ -62,7 +63,10 @@ class JobFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'job%s' % n)
     description = factory.Sequence(lambda n: 'Description %s' % n)
     playbook = factory.SubFactory(PlaybookFactory)
-    project = factory.SubFactory(structure_factories.ProjectFactory)
+    service_project_link = factory.SubFactory(openstack_factories.OpenStackTenantServiceProjectLinkFactory)
+    ssh_public_key = factory.SubFactory(structure_factories.SshPublicKeyFactory)
+    subnet = factory.SubFactory(openstack_factories.SubNetFactory)
+    user = factory.SubFactory(structure_factories.UserFactory)
 
     @factory.post_generation
     def arguments(self, create, extracted, **kwargs):

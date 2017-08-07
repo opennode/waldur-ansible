@@ -7,8 +7,8 @@ from . import models
 
 class AnsibleJobsFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains')
-    project = core_filters.URLFilter(view_name='project-detail', name='project__uuid')
-    project_uuid = django_filters.UUIDFilter(name='project__uuid')
+    project = core_filters.URLFilter(view_name='project-detail', name='service_project_link__project__uuid')
+    project_uuid = django_filters.UUIDFilter(name='service_project_link__project__uuid')
 
     class Meta(object):
         model = models.Job
