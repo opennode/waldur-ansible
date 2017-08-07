@@ -4,7 +4,7 @@ Group: Development/Libraries
 Version: 0.1.0
 Release: 1.el7
 License: MIT
-Url: http://nodeconductor.com
+Url: http://waldur.com
 Source0: %{name}-%{version}.tar.gz
 
 Requires: waldur-core > 0.145.1
