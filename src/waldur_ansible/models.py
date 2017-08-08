@@ -4,6 +4,7 @@ import re
 import uuid
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible, force_text
@@ -13,10 +14,13 @@ from model_utils import FieldTracker
 from model_utils.models import TimeStampedModel
 
 from nodeconductor.core.fields import JSONField
-from nodeconductor.core.models import NameMixin, DescribableMixin, UuidMixin
-from nodeconductor.structure.models import Project
+from nodeconductor.core.models import NameMixin, DescribableMixin, UuidMixin, SshPublicKey
+from nodeconductor_openstack.openstack_tenant import models as openstack_models
 
 from .backend import AnsibleBackend
+
+
+User = get_user_model()
 
 
 def get_upload_path(instance, filename):
@@ -92,10 +96,13 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
         )
 
     class Permissions(object):
-        project_path = 'project'
-        customer_path = 'project__customer'
+        project_path = 'service_project_link__project'
+        customer_path = 'service_project_link__project__customer'
 
-    project = models.ForeignKey(Project, related_name='+')
+    user = models.ForeignKey(User, related_name='+')
+    ssh_public_key = models.ForeignKey(SshPublicKey, related_name='+')
+    service_project_link = models.ForeignKey(openstack_models.OpenStackTenantServiceProjectLink, related_name='+')
+    subnet = models.ForeignKey(openstack_models.SubNet, related_name='+')
     playbook = models.ForeignKey(Playbook, related_name='jobs')
     arguments = JSONField(default={}, blank=True, null=True)
     output = models.TextField(blank=True)

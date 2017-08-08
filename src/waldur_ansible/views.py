@@ -5,7 +5,7 @@ from nodeconductor.core import validators as core_validators
 from nodeconductor.core import views as core_views
 from nodeconductor.structure.filters import GenericRoleFilter
 from nodeconductor.structure.metadata import ActionsMetadata
-from nodeconductor.structure.permissions import is_staff, is_manager
+from nodeconductor.structure.permissions import is_staff, is_administrator
 
 from . import filters, models, serializers, executors
 
@@ -22,7 +22,7 @@ class JobViewSet(core_mixins.CreateExecutorMixin, core_views.ActionsViewSet):
     queryset = models.Job.objects.all().order_by('pk')
     filter_backends = (GenericRoleFilter, DjangoFilterBackend)
     filter_class = filters.AnsibleJobsFilter
-    unsafe_methods_permissions = [is_manager]
+    unsafe_methods_permissions = [is_administrator]
     serializer_class = serializers.JobSerializer
     metadata_class = ActionsMetadata
     destroy_validators = [core_validators.StateValidator(models.Job.States.OK, models.Job.States.ERRED)]

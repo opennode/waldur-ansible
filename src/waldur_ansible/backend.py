@@ -7,6 +7,7 @@ import subprocess  # nosec
 
 from django.conf import settings
 
+from nodeconductor.core.views import RefreshTokenMixin
 
 logger = logging.getLogger(__name__)
 
@@ -47,12 +48,26 @@ class AnsibleBackend(object):
         command = [settings.WALDUR_ANSIBLE.get('PLAYBOOK_EXECUTION_COMMAND', 'ansible-playbook')]
         if settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'):
             command.extend(settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'))
-        if job.arguments:
-            # XXX: Passing arguments in following way is supported in Ansible>=1.2
-            command.extend(['--extra-vars', json.dumps(job.arguments)])
+
+        extra_vars = job.arguments.copy()
+        extra_vars.update(self._get_extra_vars(job))
+        # XXX: Passing arguments in following way is supported in Ansible>=1.2
+        command.extend(['--extra-vars', json.dumps(extra_vars)])
 
         command.extend(['--ssh-common-args', '-o UserKnownHostsFile=/dev/null'])
         return command + [playbook_path]
+
+    def _get_extra_vars(self, job):
+        return dict(
+            api_url=settings.WALDUR_ANSIBLE['API_URL'],
+            access_token=RefreshTokenMixin().refresh_token(job.user).key,
+            project_uuid=job.service_project_link.project.uuid.hex,
+            provider_uuid=job.service_project_link.service.uuid.hex,
+            private_key_path=settings.WALDUR_ANSIBLE['PRIVATE_KEY_PATH'],
+            public_key_uuid=settings.WALDUR_ANSIBLE['PUBLIC_KEY_UUID'],
+            user_key_uuid=job.ssh_public_key.uuid.hex,
+            subnet_uuid=job.subnet.uuid.hex,
+        )
 
     def run_job(self, job):
         command = self._get_command(job)

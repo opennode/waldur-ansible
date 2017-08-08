@@ -11,6 +11,9 @@ class AnsibleExtension(NodeConductorExtension):
             'PLAYBOOK_ARGUMENTS': ['--verbose'],
             'ANSIBLE_LIBRARY': '/usr/share/ansible-waldur/',
             'PLAYBOOK_ICON_SIZE': (64, 64),
+            'API_URL': 'http://localhost/',
+            'PRIVATE_KEY_PATH': '/etc/waldur/id_rsa',
+            'PUBLIC_KEY_UUID': 'PUBLIC_KEY_UUID',
         }
 
     @staticmethod
