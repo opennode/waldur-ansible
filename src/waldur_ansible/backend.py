@@ -60,13 +60,13 @@ class AnsibleBackend(object):
     def _get_extra_vars(self, job):
         return dict(
             api_url=settings.WALDUR_ANSIBLE['API_URL'],
-            access_token=RefreshTokenMixin().refresh_token(job.user),
-            project_uuid=job.project.uuid,
-            provider_uuid=job.service_project_link.service.uuid,
+            access_token=RefreshTokenMixin().refresh_token(job.user).key,
+            project_uuid=job.service_project_link.project.uuid.hex,
+            provider_uuid=job.service_project_link.service.uuid.hex,
             private_key_path=settings.WALDUR_ANSIBLE['PRIVATE_KEY_PATH'],
             public_key_uuid=settings.WALDUR_ANSIBLE['PUBLIC_KEY_UUID'],
-            user_key_uuid=job.ssh_public_key.uuid,
-            subnet_uuid=job.subnet.uuid,
+            user_key_uuid=job.ssh_public_key.uuid.hex,
+            subnet_uuid=job.subnet.uuid.hex,
         )
 
     def run_job(self, job):
