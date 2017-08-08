@@ -89,11 +89,21 @@ class JobSerializer(AugmentedSerializerMixin,
         view_name='openstacktenant-spl-detail',
         queryset=openstack_models.OpenStackTenantServiceProjectLink.objects.all(),
     )
+    service = serializers.HyperlinkedRelatedField(
+        source='service_project_link.service',
+        lookup_field='uuid',
+        view_name='openstacktenant-detail',
+        read_only=True,
+    )
+    service_name = serializers.ReadOnlyField(source='service_project_link.service.settings.name')
+    service_uuid = serializers.ReadOnlyField(source='service_project_link.service.uuid')
     ssh_public_key = serializers.HyperlinkedRelatedField(
         lookup_field='uuid',
         view_name='sshpublickey-detail',
         queryset=core_models.SshPublicKey.objects.all(),
     )
+    ssh_public_key_name = serializers.ReadOnlyField(source='ssh_public_key.name')
+    ssh_public_key_uuid = serializers.ReadOnlyField(source='ssh_public_key.uuid')
     project = serializers.HyperlinkedRelatedField(
         source='service_project_link.project',
         lookup_field='uuid',
@@ -109,15 +119,19 @@ class JobSerializer(AugmentedSerializerMixin,
     )
     playbook_name = serializers.ReadOnlyField(source='playbook.name')
     playbook_uuid = serializers.ReadOnlyField(source='playbook.uuid')
+    playbook_image = serializers.FileField(source='playbook.image', read_only=True)
+    playbook_description = serializers.ReadOnlyField(source='playbook.description')
     arguments = JSONField(default={})
     state = serializers.SerializerMethodField()
 
     class Meta(object):
         model = models.Job
         fields = ('url', 'uuid', 'name', 'description',
-                  'service_project_link', 'ssh_public_key',
+                  'service_project_link', 'service', 'service_name', 'service_uuid',
+                  'ssh_public_key', 'ssh_public_key_name', 'ssh_public_key_uuid',
                   'project', 'project_name', 'project_uuid',
                   'playbook', 'playbook_name', 'playbook_uuid',
+                  'playbook_image', 'playbook_description',
                   'arguments', 'state', 'output', 'created', 'modified')
         read_only_fields = ('output', 'created', 'modified')
         protected_fields = ('service_project_link', 'ssh_public_key', 'playbook', 'arguments')
