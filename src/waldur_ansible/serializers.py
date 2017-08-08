@@ -9,7 +9,7 @@ from rest_framework import serializers, exceptions
 from nodeconductor.core import models as core_models
 from nodeconductor.core.utils import get_detail_view_name
 from nodeconductor.core.serializers import AugmentedSerializerMixin, JSONField
-from nodeconductor.structure.permissions import _has_manager_access
+from nodeconductor.structure.permissions import _has_admin_access
 from nodeconductor.structure.serializers import PermissionFieldFilteringMixin
 from nodeconductor_openstack.openstack_tenant import models as openstack_models
 
@@ -150,7 +150,7 @@ class JobSerializer(AugmentedSerializerMixin,
             project = self.instance.service_project_link.project
         else:
             project = attrs['service_project_link'].project
-        if not _has_manager_access(self.context['request'].user, project):
+        if not _has_admin_access(self.context['request'].user, project):
             raise exceptions.PermissionDenied()
 
     def check_arguments(self, attrs):

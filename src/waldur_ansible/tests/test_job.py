@@ -50,14 +50,14 @@ class JobRetrieveTest(JobBaseTest):
 @ddt
 class JobCreateTest(JobBaseTest):
 
-    @data('staff', 'owner', 'manager')
+    @data('staff', 'owner', 'manager', 'admin')
     def test_user_can_create_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         payload = self._get_valid_payload(getattr(self.fixture, user))
         response = self.client.post(factories.JobFactory.get_list_url(), data=payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
 
-    @data('global_support', 'customer_support', 'admin', 'project_support')
+    @data('global_support', 'customer_support', 'project_support')
     def test_user_cannot_create_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         payload = self._get_valid_payload(getattr(self.fixture, user))
@@ -89,7 +89,7 @@ class JobCreateTest(JobBaseTest):
 @ddt
 class JobUpdateTest(JobBaseTest):
 
-    @data('staff', 'owner', 'manager')
+    @data('staff', 'owner', 'manager', 'admin')
     def test_user_can_update_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         payload = {'name': 'test job 2'}
@@ -99,7 +99,7 @@ class JobUpdateTest(JobBaseTest):
         self.job.refresh_from_db()
         self.assertEqual(self.job.name, payload['name'])
 
-    @data('global_support', 'customer_support', 'admin', 'project_support')
+    @data('global_support', 'customer_support', 'project_support')
     def test_user_cannot_update_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         payload = {'name': 'test job 2'}
@@ -110,13 +110,13 @@ class JobUpdateTest(JobBaseTest):
 @ddt
 class JobDeleteTest(JobBaseTest):
 
-    @data('staff', 'owner', 'manager')
+    @data('staff', 'owner', 'manager', 'admin')
     def test_staff_user_can_delete_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         response = self.client.delete(factories.JobFactory.get_url(self.job))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    @data('global_support', 'customer_support', 'admin', 'project_support')
+    @data('global_support', 'customer_support', 'project_support')
     def test_user_cannot_delete_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         response = self.client.delete(factories.JobFactory.get_url(self.job))
