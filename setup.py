@@ -9,7 +9,7 @@ tests_requires = [
 ]
 
 install_requires = [
-    'nodeconductor>=0.145.2',
+    'nodeconductor>0.145.2',
     'nodeconductor-openstack>=0.33.2',
 ]
 
