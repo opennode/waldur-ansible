@@ -121,3 +121,14 @@ class JobDeleteTest(JobBaseTest):
         self.client.force_authenticate(getattr(self.fixture, user))
         response = self.client.delete(factories.JobFactory.get_url(self.job))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class CountersTest(JobBaseTest):
+    def test_project_counter_has_experts(self):
+        url = structure_factories.ProjectFactory.get_url(self.fixture.project, action='counters')
+        self.client.force_authenticate(self.fixture.owner)
+
+        response = self.client.get(url, {'fields': ['ansible']})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'ansible': 1})
