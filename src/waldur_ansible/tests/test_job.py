@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from ddt import data, ddt
+import mock
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
@@ -132,3 +133,16 @@ class CountersTest(JobBaseTest):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'ansible': 1})
+
+
+class JobBackendTest(JobBaseTest):
+    @mock.patch('subprocess.check_output')
+    @mock.patch('os.path.exists')
+    def test_job_id_is_passed_as_extra_argument_to_ansible(self, path_exists, check_output):
+        path_exists.return_value = True
+        check_output.return_value = 'OK'
+
+        self.job.get_backend().run_job(self.job)
+        args = check_output.call_args[0][0]
+        command = ' '.join(args)
+        self.assertTrue(self.job.get_tag() in command)
