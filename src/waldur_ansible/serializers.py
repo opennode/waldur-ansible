@@ -123,6 +123,7 @@ class JobSerializer(AugmentedSerializerMixin,
     playbook_description = serializers.ReadOnlyField(source='playbook.description')
     arguments = JSONField(default={})
     state = serializers.SerializerMethodField()
+    tag = serializers.SerializerMethodField()
 
     class Meta(object):
         model = models.Job
@@ -132,7 +133,7 @@ class JobSerializer(AugmentedSerializerMixin,
                   'project', 'project_name', 'project_uuid',
                   'playbook', 'playbook_name', 'playbook_uuid',
                   'playbook_image', 'playbook_description',
-                  'arguments', 'state', 'output', 'created', 'modified')
+                  'arguments', 'state', 'output', 'created', 'modified', 'tag')
         read_only_fields = ('output', 'created', 'modified')
         protected_fields = ('service_project_link', 'ssh_public_key', 'playbook', 'arguments')
         extra_kwargs = {
@@ -144,6 +145,9 @@ class JobSerializer(AugmentedSerializerMixin,
 
     def get_state(self, obj):
         return obj.get_state_display()
+
+    def get_tag(self, obj):
+        return obj.get_tag()
 
     def check_project(self, attrs):
         if self.instance:

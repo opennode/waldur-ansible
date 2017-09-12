@@ -136,3 +136,6 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
 
     def __str__(self):
         return self.name
+
+    def get_tag(self):
+        return 'job:%s' % self.uuid.hex

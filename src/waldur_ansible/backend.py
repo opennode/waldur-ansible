@@ -67,6 +67,7 @@ class AnsibleBackend(object):
             public_key_uuid=settings.WALDUR_ANSIBLE['PUBLIC_KEY_UUID'],
             user_key_uuid=job.ssh_public_key.uuid.hex,
             subnet_uuid=job.subnet.uuid.hex,
+            tags=[job.get_tag()],
         )
 
     def run_job(self, job):
