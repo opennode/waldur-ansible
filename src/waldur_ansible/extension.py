@@ -6,9 +6,13 @@ class AnsibleExtension(NodeConductorExtension):
     class Settings:
         WALDUR_ANSIBLE = {
             'PLAYBOOKS_DIR_NAME': 'ansible_playbooks',
-            'PRESERVE_PLAYBOOK_ARCHIVE_AFTER_DELETION': False,
             'PLAYBOOK_EXECUTION_COMMAND': 'ansible-playbook',
-            'PLAYBOOK_ARGUMENTS': ['-i', '"localhost,"', '-c', 'local'],
+            'PLAYBOOK_ARGUMENTS': ['--verbose'],
+            'ANSIBLE_LIBRARY': '/usr/share/ansible-waldur/',
+            'PLAYBOOK_ICON_SIZE': (64, 64),
+            'API_URL': 'http://localhost/',
+            'PRIVATE_KEY_PATH': '/etc/waldur/id_rsa',
+            'PUBLIC_KEY_UUID': 'PUBLIC_KEY_UUID',
         }
 
     @staticmethod

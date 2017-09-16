@@ -34,7 +34,7 @@ class AddPlaybookParameterInline(admin.TabularInline):
 class ChangePlaybookAdminForm(forms.ModelForm):
     class Meta:
         model = models.Playbook
-        fields = ('name', 'description', 'entrypoint')
+        fields = ('name', 'description', 'image', 'entrypoint', )
 
 
 class AddPlaybookAdminForm(forms.ModelForm):
@@ -42,7 +42,7 @@ class AddPlaybookAdminForm(forms.ModelForm):
 
     class Meta:
         model = models.Playbook
-        fields = ('name', 'description', 'entrypoint')
+        fields = ('name', 'description', 'image', 'entrypoint')
 
     def clean_archive(self):
         value = self.cleaned_data['archive']
@@ -140,34 +140,21 @@ class JobAdminForm(forms.ModelForm):
         for parameter in unfilled_parameters:
             if parameter.default:
                 arguments[parameter.name] = parameter.default
-        arguments['project_uuid'] = self.instance.project.uuid.hex
         return super(JobAdminForm, self).save(commit)
 
 
 class JobAdmin(admin.ModelAdmin):
     form = JobAdminForm
-    fields = ('name', 'description', 'state', 'project',
+    fields = ('name', 'description', 'state', 'service_project_link',
               'playbook', 'arguments', 'output')
-    list_filter = ('name', 'description', 'project', 'playbook')
-    list_display = ('name', 'state', 'project', 'playbook')
+    list_filter = ('name', 'description', 'service_project_link', 'playbook')
+    list_display = ('name', 'state', 'service_project_link', 'playbook')
     readonly_fields = ('output', 'created', 'modified')
-    actions = ['execute']
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:
-            return self.readonly_fields + ('project', 'playbook')
+            return self.readonly_fields + ('playbook',)
         return self.readonly_fields
-
-    class Execute(ExecutorAdminAction):
-        executor = executors.RunJobExecutor
-        short_description = _('Execute')
-
-        def validate(self, job):
-            States = models.Job.States
-            if job.state not in (States.OK, States.ERRED):
-                raise ValidationError(_('Job has to be OK or erred.'))
-
-    execute = Execute()
 
 
 admin.site.register(models.Playbook, PlaybookAdmin)

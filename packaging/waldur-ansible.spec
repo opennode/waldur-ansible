@@ -1,13 +1,14 @@
 Name: waldur-ansible
 Summary: Ansible plugin for Waldur
 Group: Development/Libraries
-Version: 0.1.0
+Version: 0.2.0
 Release: 1.el7
 License: MIT
-Url: http://nodeconductor.com
+Url: http://waldur.com
 Source0: %{name}-%{version}.tar.gz
 
-Requires: waldur-core > 0.140.1
+Requires: waldur-core > 0.145.2
+Requires: waldur-openstack >= 0.33.1
 
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -35,9 +36,8 @@ rm -rf %{buildroot}
 %{python_sitelib}/*
 
 %changelog
-* Tue Jul 25 2017 Jenkins <jenkins@opennodecloud.com> - 0.1.0-1.el7
+* Sat Sep 16 2017 Jenkins <jenkins@opennodecloud.com> - 0.2.0-1.el7
 - New upstream release
 
-* Mon May 29 2017 Dmitri Tsumak <dmitri@opennodecloud.com> - 0.1.0-1.el7
-- Initial version of the package
-
+* Tue Jul 25 2017 Jenkins <jenkins@opennodecloud.com> - 0.1.0-1.el7
+- New upstream release
