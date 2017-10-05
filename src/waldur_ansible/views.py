@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import decorators, response, status
 
 from nodeconductor.core import mixins as core_mixins
 from nodeconductor.core import validators as core_validators
@@ -28,6 +29,18 @@ class JobViewSet(core_mixins.CreateExecutorMixin, core_views.ActionsViewSet):
     metadata_class = ActionsMetadata
     destroy_validators = [core_validators.StateValidator(models.Job.States.OK, models.Job.States.ERRED)]
     create_executor = executors.RunJobExecutor
+
+    @decorators.list_route(methods=['POST'])
+    def estimate(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        job = serializer.save()
+        backend = job.get_backend()
+        backend.run_job(job, check_mode=True)
+        job.refresh_from_db()
+        items = backend.decode_output(job.output)
+        job.delete()
+        return response.Response(items, status=status.HTTP_200_OK)
 
 
 def get_project_jobs_count(project):
