@@ -40,7 +40,7 @@ class AnsibleBackend(object):
     def __init__(self, playbook):
         self.playbook = playbook
 
-    def _get_command(self, job):
+    def _get_command(self, job, check_mode):
         playbook_path = os.path.join(self.playbook.workspace, self.playbook.entrypoint)
         if not os.path.exists(playbook_path):
             raise AnsibleBackendError('Playbook %s does not exist.' % playbook_path)
@@ -48,6 +48,9 @@ class AnsibleBackend(object):
         command = [settings.WALDUR_ANSIBLE.get('PLAYBOOK_EXECUTION_COMMAND', 'ansible-playbook')]
         if settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'):
             command.extend(settings.WALDUR_ANSIBLE.get('PLAYBOOK_ARGUMENTS'))
+
+        if check_mode:
+            command.append('--check')
 
         extra_vars = job.arguments.copy()
         extra_vars.update(self._get_extra_vars(job))
@@ -70,8 +73,8 @@ class AnsibleBackend(object):
             tags=[job.get_tag()],
         )
 
-    def run_job(self, job):
-        command = self._get_command(job)
+    def run_job(self, job, check_mode=False):
+        command = self._get_command(job, check_mode)
         command_str = ' '.join(command)
 
         logger.debug('Executing command "%s".', command_str)
@@ -91,3 +94,23 @@ class AnsibleBackend(object):
             logger.info('Command "%s" was successfully executed.', command_str)
             job.output = output
             job.save(update_fields=['output'])
+
+    def decode_output(self, output):
+        items = []
+        for line in output.splitlines():
+            if 'WALDUR_CHECK_MODE' not in line:
+                continue
+            parts = line.split('ok: [localhost] => ')
+            if len(parts) != 2:
+                continue
+            try:
+                payload = json.loads(parts[1])
+            except TypeError:
+                continue
+            if 'instance' in payload:
+                payload = payload['instance']
+            if 'WALDUR_CHECK_MODE' in payload:
+                del payload['WALDUR_CHECK_MODE']
+            if payload:
+                items.append(payload)
+        return items
