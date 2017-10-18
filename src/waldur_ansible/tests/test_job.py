@@ -6,6 +6,7 @@ from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
 from nodeconductor.structure.tests import factories as structure_factories
+from nodeconductor_openstack.openstack_tenant import models as openstack_models
 from nodeconductor_openstack.openstack_tenant.tests import factories as openstack_factories
 
 from . import factories, fixtures
@@ -112,16 +113,26 @@ class JobUpdateTest(JobBaseTest):
 class JobDeleteTest(JobBaseTest):
 
     @data('staff', 'owner', 'manager', 'admin')
-    def test_staff_user_can_delete_job(self, user):
+    def test_authorized_user_can_delete_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         response = self.client.delete(factories.JobFactory.get_url(self.job))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     @data('global_support', 'customer_support', 'project_support')
-    def test_user_cannot_delete_job(self, user):
+    def test_non_authorized_user_cannot_delete_job(self, user):
         self.client.force_authenticate(getattr(self.fixture, user))
         response = self.client.delete(factories.JobFactory.get_url(self.job))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_if_related_resources_are_not_stable_deletion_is_not_allowed(self):
+        vm = openstack_factories.InstanceFactory()
+        vm.tags.add(self.job.get_tag())
+        vm.state = openstack_models.Instance.States.UPDATING
+        vm.save()
+
+        self.client.force_authenticate(self.fixture.staff)
+        response = self.client.delete(factories.JobFactory.get_url(self.job))
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class CountersTest(JobBaseTest):
