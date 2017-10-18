@@ -100,7 +100,7 @@ class AnsibleBackend(object):
         for line in output.splitlines():
             if 'WALDUR_CHECK_MODE' not in line:
                 continue
-            parts = line.split('ok: [localhost] => ')
+            parts = line.split(' => ')
             if len(parts) != 2:
                 continue
             try:
