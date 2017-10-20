@@ -9,12 +9,11 @@ from django.core import validators
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible, force_text
 from django.utils.translation import ugettext_lazy as _
-from django_fsm import transition, FSMIntegerField
 from model_utils import FieldTracker
 from model_utils.models import TimeStampedModel
 
 from nodeconductor.core.fields import JSONField
-from nodeconductor.core.models import NameMixin, DescribableMixin, UuidMixin, SshPublicKey
+from nodeconductor.core import models as core_models
 from nodeconductor_openstack.openstack_tenant import models as openstack_models
 
 from .backend import AnsibleBackend
@@ -28,7 +27,10 @@ def get_upload_path(instance, filename):
 
 
 @python_2_unicode_compatible
-class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
+class Playbook(core_models.UuidMixin,
+               core_models.NameMixin,
+               core_models.DescribableMixin,
+               models.Model):
     workspace = models.CharField(max_length=255, unique=True, help_text=_('Absolute path to the playbook workspace.'))
     entrypoint = models.CharField(max_length=255, help_text=_('Relative path to the file in the workspace to execute.'))
     image = models.ImageField(upload_to=get_upload_path, null=True, blank=True)
@@ -37,6 +39,9 @@ class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
     @staticmethod
     def get_url_name():
         return 'ansible_playbook'
+
+    def get_playbook_path(self):
+        return os.path.join(self.workspace, self.entrypoint)
 
     @staticmethod
     def generate_workspace_path():
@@ -58,7 +63,7 @@ class Playbook(UuidMixin, NameMixin, DescribableMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class PlaybookParameter(DescribableMixin, models.Model):
+class PlaybookParameter(core_models.DescribableMixin, models.Model):
     class Meta(object):
         unique_together = ('playbook', 'name')
         ordering = ['order']
@@ -78,38 +83,27 @@ class PlaybookParameter(DescribableMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model):
+class Job(core_models.UuidMixin,
+          core_models.StateMixin,
+          core_models.NameMixin,
+          core_models.DescribableMixin,
+          TimeStampedModel,
+          models.Model):
+
     class Meta(object):
         pass
-
-    class States(object):
-        SCHEDULED = 1
-        EXECUTING = 2
-        OK = 3
-        ERRED = 4
-
-        CHOICES = (
-            (SCHEDULED, _('Scheduled')),
-            (EXECUTING, _('Executing')),
-            (OK, _('OK')),
-            (ERRED, _('Erred')),
-        )
 
     class Permissions(object):
         project_path = 'service_project_link__project'
         customer_path = 'service_project_link__project__customer'
 
     user = models.ForeignKey(User, related_name='+')
-    ssh_public_key = models.ForeignKey(SshPublicKey, related_name='+')
+    ssh_public_key = models.ForeignKey(core_models.SshPublicKey, related_name='+')
     service_project_link = models.ForeignKey(openstack_models.OpenStackTenantServiceProjectLink, related_name='+')
     subnet = models.ForeignKey(openstack_models.SubNet, related_name='+')
     playbook = models.ForeignKey(Playbook, related_name='jobs')
     arguments = JSONField(default={}, blank=True, null=True)
     output = models.TextField(blank=True)
-    state = FSMIntegerField(
-        default=States.SCHEDULED,
-        choices=States.CHOICES,
-    )
 
     @staticmethod
     def get_url_name():
@@ -117,18 +111,6 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
 
     def get_backend(self):
         return self.playbook.get_backend()
-
-    @transition(field=state, source=States.SCHEDULED, target=States.EXECUTING)
-    def begin_executing(self):
-        pass
-
-    @transition(field=state, source=States.EXECUTING, target=States.OK)
-    def set_ok(self):
-        pass
-
-    @transition(field=state, source=States.EXECUTING, target=States.ERRED)
-    def set_erred(self):
-        pass
 
     @property
     def human_readable_state(self):
@@ -139,3 +121,6 @@ class Job(UuidMixin, NameMixin, DescribableMixin, TimeStampedModel, models.Model
 
     def get_tag(self):
         return 'job:%s' % self.uuid.hex
+
+    def get_related_resources(self):
+        return openstack_models.Instance.objects.filter(tags__name=self.get_tag())

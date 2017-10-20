@@ -101,6 +101,7 @@ class JobSerializer(AugmentedSerializerMixin,
         lookup_field='uuid',
         view_name='sshpublickey-detail',
         queryset=core_models.SshPublicKey.objects.all(),
+        required=True,
     )
     ssh_public_key_name = serializers.ReadOnlyField(source='ssh_public_key.name')
     ssh_public_key_uuid = serializers.ReadOnlyField(source='ssh_public_key.uuid')
