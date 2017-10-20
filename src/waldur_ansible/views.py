@@ -1,6 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import decorators, response, status
 
 from nodeconductor.core import exceptions as core_exceptions
 from nodeconductor.core import mixins as core_mixins
@@ -12,7 +11,7 @@ from nodeconductor.structure.filters import GenericRoleFilter
 from nodeconductor.structure.metadata import ActionsMetadata
 from nodeconductor.structure.permissions import is_staff, is_administrator
 
-from . import filters, models, serializers, executors, estimator
+from . import filters, models, serializers, executors
 
 
 class PlaybookViewSet(core_views.ActionsViewSet):
@@ -45,11 +44,6 @@ class JobViewSet(core_mixins.CreateExecutorMixin, core_views.ActionsViewSet):
         core_validators.StateValidator(models.Job.States.OK, models.Job.States.ERRED)
     ]
     delete_executor = executors.DeleteJobExecutor
-
-    @decorators.list_route(methods=['POST'])
-    def estimate(self, request):
-        report = estimator.get_report(request)
-        return response.Response(report, status=status.HTTP_200_OK)
 
 
 def get_project_jobs_count(project):
