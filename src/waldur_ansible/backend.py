@@ -41,7 +41,7 @@ class AnsibleBackend(object):
         self.playbook = playbook
 
     def _get_command(self, job, check_mode):
-        playbook_path = os.path.join(self.playbook.workspace, self.playbook.entrypoint)
+        playbook_path = self.playbook.get_playbook_path()
         if not os.path.exists(playbook_path):
             raise AnsibleBackendError('Playbook %s does not exist.' % playbook_path)
 

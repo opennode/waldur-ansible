@@ -40,6 +40,9 @@ class Playbook(core_models.UuidMixin,
     def get_url_name():
         return 'ansible_playbook'
 
+    def get_playbook_path(self):
+        return os.path.join(self.workspace, self.entrypoint)
+
     @staticmethod
     def generate_workspace_path():
         base_path = os.path.join(
