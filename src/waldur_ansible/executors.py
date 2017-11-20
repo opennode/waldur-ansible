@@ -3,8 +3,8 @@ from celery import chain
 from nodeconductor.core import executors as core_executors
 from nodeconductor.core import tasks as core_tasks
 from nodeconductor.core import utils as core_utils
-from nodeconductor_openstack.openstack_tenant import models as openstack_models
-from nodeconductor_openstack.openstack_tenant import executors as openstack_executors
+from waldur_openstack.openstack_tenant import models as openstack_models
+from waldur_openstack.openstack_tenant import executors as openstack_executors
 
 
 class RunJobExecutor(core_executors.CreateExecutor):

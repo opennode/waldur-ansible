@@ -1,6 +1,6 @@
 from django.utils.functional import cached_property
 
-from nodeconductor_openstack.openstack_tenant.tests import fixtures as openstack_fixtures
+from waldur_openstack.openstack_tenant.tests import fixtures as openstack_fixtures
 
 from . import factories
 
