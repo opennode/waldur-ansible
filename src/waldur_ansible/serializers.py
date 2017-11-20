@@ -11,7 +11,7 @@ from nodeconductor.core.utils import get_detail_view_name
 from nodeconductor.core.serializers import AugmentedSerializerMixin, JSONField
 from nodeconductor.structure.permissions import _has_admin_access
 from nodeconductor.structure.serializers import PermissionFieldFilteringMixin
-from nodeconductor_openstack.openstack_tenant import models as openstack_models
+from waldur_openstack.openstack_tenant import models as openstack_models
 
 from . import models
 

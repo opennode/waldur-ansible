@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from nodeconductor.core.utils import get_detail_view_name, get_list_view_name
 from nodeconductor.structure import models
 from nodeconductor.structure.tests import factories as structure_factories
-from nodeconductor_openstack.openstack_tenant.tests import factories as openstack_factories
+from waldur_openstack.openstack_tenant.tests import factories as openstack_factories
 
 from .. import models
 

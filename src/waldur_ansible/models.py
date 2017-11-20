@@ -14,7 +14,7 @@ from model_utils.models import TimeStampedModel
 
 from nodeconductor.core.fields import JSONField
 from nodeconductor.core import models as core_models
-from nodeconductor_openstack.openstack_tenant import models as openstack_models
+from waldur_openstack.openstack_tenant import models as openstack_models
 
 from .backend import AnsibleBackend
 
