@@ -5,7 +5,7 @@ import mock
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
-from nodeconductor.structure.tests import factories as structure_factories
+from waldur_core.structure.tests import factories as structure_factories
 from waldur_openstack.openstack_tenant import models as openstack_models
 from waldur_openstack.openstack_tenant.tests import factories as openstack_factories
 

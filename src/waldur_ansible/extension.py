@@ -1,7 +1,7 @@
-from nodeconductor.core import NodeConductorExtension
+from waldur_core.core import WaldurExtension
 
 
-class AnsibleExtension(NodeConductorExtension):
+class AnsibleExtension(WaldurExtension):
 
     class Settings:
         WALDUR_ANSIBLE = {
