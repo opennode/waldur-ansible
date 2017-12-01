@@ -8,7 +8,7 @@ Url: http://waldur.com
 Source0: %{name}-%{version}.tar.gz
 
 Requires: waldur-core >= 0.151.0
-Requires: waldur-openstack >= 0.33.1
+Requires: waldur-openstack >= 0.38.2
 
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot

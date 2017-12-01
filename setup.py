@@ -10,7 +10,7 @@ tests_requires = [
 
 install_requires = [
     'waldur-core>=0.151.0',
-    'waldur-openstack>=0.33.2',
+    'waldur-openstack>=0.38.2',
 ]
 
 
