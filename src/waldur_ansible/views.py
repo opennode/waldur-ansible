@@ -1,15 +1,15 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.translation import ugettext_lazy as _
 
-from nodeconductor.core import exceptions as core_exceptions
-from nodeconductor.core import mixins as core_mixins
-from nodeconductor.core import validators as core_validators
-from nodeconductor.core import views as core_views
-from nodeconductor.structure import models as structure_models
-from nodeconductor.structure import views as structure_views
-from nodeconductor.structure.filters import GenericRoleFilter
-from nodeconductor.structure.metadata import ActionsMetadata
-from nodeconductor.structure.permissions import is_staff, is_administrator
+from waldur_core.core import exceptions as core_exceptions
+from waldur_core.core import mixins as core_mixins
+from waldur_core.core import validators as core_validators
+from waldur_core.core import views as core_views
+from waldur_core.structure import models as structure_models
+from waldur_core.structure import views as structure_views
+from waldur_core.structure.filters import GenericRoleFilter
+from waldur_core.structure.metadata import ActionsMetadata
+from waldur_core.structure.permissions import is_staff, is_administrator
 
 from . import filters, models, serializers, executors
 

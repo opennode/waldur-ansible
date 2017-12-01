@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from jsoneditor.forms import JSONEditor
 
-from nodeconductor.core.admin import ExecutorAdminAction
+from waldur_core.core.admin import ExecutorAdminAction
 
 from . import models, executors
 
