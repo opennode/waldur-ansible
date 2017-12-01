@@ -1,8 +1,8 @@
 from celery import chain
 
-from nodeconductor.core import executors as core_executors
-from nodeconductor.core import tasks as core_tasks
-from nodeconductor.core import utils as core_utils
+from waldur_core.core import executors as core_executors
+from waldur_core.core import tasks as core_tasks
+from waldur_core.core import utils as core_utils
 from waldur_openstack.openstack_tenant import models as openstack_models
 from waldur_openstack.openstack_tenant import executors as openstack_executors
 

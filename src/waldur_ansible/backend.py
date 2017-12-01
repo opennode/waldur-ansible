@@ -7,7 +7,7 @@ import subprocess  # nosec
 
 from django.conf import settings
 
-from nodeconductor.core.views import RefreshTokenMixin
+from waldur_core.core.views import RefreshTokenMixin
 
 logger = logging.getLogger(__name__)
 

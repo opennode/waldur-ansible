@@ -6,11 +6,11 @@ from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
 
-from nodeconductor.core import models as core_models
-from nodeconductor.core.utils import get_detail_view_name
-from nodeconductor.core.serializers import AugmentedSerializerMixin, JSONField
-from nodeconductor.structure.permissions import _has_admin_access
-from nodeconductor.structure.serializers import PermissionFieldFilteringMixin
+from waldur_core.core import models as core_models
+from waldur_core.core.utils import get_detail_view_name
+from waldur_core.core.serializers import AugmentedSerializerMixin, JSONField
+from waldur_core.structure.permissions import _has_admin_access
+from waldur_core.structure.serializers import PermissionFieldFilteringMixin
 from waldur_openstack.openstack_tenant import models as openstack_models
 
 from . import models

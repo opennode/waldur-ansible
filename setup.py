@@ -9,8 +9,8 @@ tests_requires = [
 ]
 
 install_requires = [
-    'nodeconductor>0.145.2',
-    'waldur-openstack>=0.33.2',
+    'waldur-core>=0.151.0',
+    'waldur-openstack>=0.38.2',
 ]
 
 
@@ -30,7 +30,7 @@ setup(
         'tests': tests_requires,
     },
     entry_points={
-        'nodeconductor_extensions': (
+        'waldur_extensions': (
             'waldur_ansible = waldur_ansible.extension:AnsibleExtension',
         ),
     },

@@ -5,7 +5,7 @@ from ddt import data, ddt
 from rest_framework.test import APITransactionTestCase
 from rest_framework import status
 
-from nodeconductor.structure.tests.fixtures import ProjectFixture
+from waldur_core.structure.tests.fixtures import ProjectFixture
 
 from . import factories
 

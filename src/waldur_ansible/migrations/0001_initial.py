@@ -8,8 +8,8 @@ import django.db.models.deletion
 import django.utils.timezone
 import django_fsm
 import model_utils.fields
-import nodeconductor.core.fields
-import nodeconductor.core.validators
+import waldur_core.core.fields
+import waldur_core.core.validators
 import re
 
 
@@ -29,9 +29,9 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('description', models.CharField(blank=True, max_length=500, verbose_name='description')),
-                ('name', models.CharField(max_length=150, validators=[nodeconductor.core.validators.validate_name], verbose_name='name')),
-                ('uuid', nodeconductor.core.fields.UUIDField()),
-                ('arguments', nodeconductor.core.fields.JSONField(blank=True, default={}, null=True)),
+                ('name', models.CharField(max_length=150, validators=[waldur_core.core.validators.validate_name], verbose_name='name')),
+                ('uuid', waldur_core.core.fields.UUIDField()),
+                ('arguments', waldur_core.core.fields.JSONField(blank=True, default={}, null=True)),
                 ('output', models.TextField(blank=True)),
                 ('state', django_fsm.FSMIntegerField(choices=[(1, 'Scheduled'), (2, 'Executing'), (3, 'OK'), (4, 'Erred')], default=1)),
             ],
@@ -41,8 +41,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('description', models.CharField(blank=True, max_length=500, verbose_name='description')),
-                ('name', models.CharField(max_length=150, validators=[nodeconductor.core.validators.validate_name], verbose_name='name')),
-                ('uuid', nodeconductor.core.fields.UUIDField()),
+                ('name', models.CharField(max_length=150, validators=[waldur_core.core.validators.validate_name], verbose_name='name')),
+                ('uuid', waldur_core.core.fields.UUIDField()),
                 ('workspace', models.CharField(help_text='Absolute path to the playbook workspace.', max_length=255, unique=True)),
                 ('entrypoint', models.CharField(help_text='Relative path to the file in the workspace to execute.', max_length=255)),
             ],
