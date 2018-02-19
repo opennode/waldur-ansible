@@ -31,7 +31,8 @@ setup(
     },
     entry_points={
         'waldur_extensions': (
-            'waldur_ansible = waldur_ansible.extension:AnsibleExtension',
+            'waldur_playbook_jobs = waldur_ansible.playbook_jobs.extension:PlaybookJobsExtension',
+            'waldur_python_management = waldur_ansible.python_management.extension:PythonManagementExtension',
         ),
     },
     include_package_data=True,
