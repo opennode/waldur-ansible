@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 from zipfile import is_zipfile, ZipFile
 
 from django.db import transaction
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
+from waldur_ansible.common import serializers as common_serializers
 from waldur_ansible.playbook_jobs import models as playbook_jobs_models
 from waldur_openstack.openstack_tenant import models as openstack_models
 
@@ -77,9 +79,11 @@ class PlaybookSerializer(core_serializers.AugmentedSerializerMixin, serializers.
         return playbook
 
 
-class JobSerializer(core_serializers.AugmentedSerializerMixin,
+class JobSerializer(six.with_metaclass(
+                    common_serializers.ApplicationSerializerMetaclass,
+                    core_serializers.AugmentedSerializerMixin,
                     structure_serializers.PermissionFieldFilteringMixin,
-                    serializers.HyperlinkedModelSerializer):
+                    serializers.HyperlinkedModelSerializer)):
     service_project_link = serializers.HyperlinkedRelatedField(
         lookup_field='pk',
         view_name='openstacktenant-spl-detail',
@@ -139,7 +143,7 @@ class JobSerializer(core_serializers.AugmentedSerializerMixin,
         }
 
     def get_type(self, obj):
-        return 'ansible_job'
+        return 'playbook_job'
 
     def get_filtered_field_names(self):
         return 'project', 'service_project_link', 'ssh_public_key'

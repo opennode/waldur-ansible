@@ -4,9 +4,10 @@ import factory
 from rest_framework.reverse import reverse
 from waldur_ansible.playbook_jobs import models
 from waldur_ansible.python_management import models
+from waldur_openstack.openstack_tenant.tests import factories as openstack_factories
+
 from waldur_core.core import utils as core_utils
 from waldur_core.structure.tests import factories as structure_factories
-from waldur_openstack.openstack_tenant.tests import factories as openstack_factories
 
 
 class PythonManagementFactory(factory.DjangoModelFactory):
@@ -15,7 +16,7 @@ class PythonManagementFactory(factory.DjangoModelFactory):
 
     user = factory.SubFactory(structure_factories.UserFactory)
     instance = factory.SubFactory(openstack_factories.InstanceFactory)
-    service_project_link = factory.SubFactory(openstack_factories.OpenStackTenantServiceProjectLinkFactory)
+    project = factory.SubFactory(structure_factories.ProjectFactory)
     virtual_envs_dir_path = factory.Sequence(lambda n: 'virtual_envs_dir_path%s' % n)
 
     @classmethod

@@ -74,11 +74,6 @@ class PythonManagementServiceTest(TestCase):
     def returns_false(self, lock_value):
         return False
 
-    def test_removal_not_possible_to_enter_if_entry_point_locked(self):
-        python_management = self.fixture.python_management
-        with patch('waldur_ansible.python_management.python_management_service.cache_utils.is_syncing', side_effect=self.returns_true):
-            self.assertRaises(APIException, lambda: python_management_service.PythonManagementService().schedule_python_management_removal(python_management))
-
     def test_removal_not_possible_to_process_if_is_processing(self):
         python_management = self.fixture.python_management
         with patch('waldur_ansible.python_management.python_management_service.locking_service.PythonManagementBackendLockingService.is_processing_allowed',
@@ -91,11 +86,6 @@ class PythonManagementServiceTest(TestCase):
             python_management_service.PythonManagementService().schedule_python_management_removal(python_management)
             execute.assert_called_once()
 
-    def test_virtual_env_search_not_possible_to_enter_if_entry_point_locked(self):
-        python_management = self.fixture.python_management
-        with patch('waldur_ansible.python_management.python_management_service.cache_utils.is_syncing', side_effect=self.returns_true):
-            self.assertRaises(APIException, lambda: python_management_service.PythonManagementService().schedule_virtual_environments_search(python_management))
-
     def test_virtual_env_search_not_possible_to_process_if_is_processing(self):
         python_management = self.fixture.python_management
         with patch('waldur_ansible.python_management.python_management_service.locking_service.PythonManagementBackendLockingService.is_processing_allowed',
@@ -107,12 +97,6 @@ class PythonManagementServiceTest(TestCase):
         with patch('waldur_ansible.python_management.python_management_service.executors.PythonManagementRequestExecutor.execute') as execute:
             python_management_service.PythonManagementService().schedule_virtual_environments_search(python_management)
             execute.assert_called_once()
-
-    def test_installed_libs_search_not_possible_to_enter_if_entry_point_locked(self):
-        python_management = self.fixture.python_management
-        virtual_env_name = 'oh-my-env'
-        with patch('waldur_ansible.python_management.python_management_service.cache_utils.is_syncing', side_effect=self.returns_true):
-            self.assertRaises(APIException, lambda: python_management_service.PythonManagementService().schedule_installed_libraries_search(python_management, virtual_env_name))
 
     def test_installed_libs_search_not_possible_to_process_if_is_processing(self):
         python_management = self.fixture.python_management
@@ -127,11 +111,6 @@ class PythonManagementServiceTest(TestCase):
         with patch('waldur_ansible.python_management.python_management_service.executors.PythonManagementRequestExecutor.execute') as execute:
             python_management_service.PythonManagementService().schedule_installed_libraries_search(python_management, virtual_env_name)
             execute.assert_called_once()
-
-    def test_update_not_possible_to_enter_if_entry_point_locked(self):
-        python_management = self.fixture.python_management
-        with patch('waldur_ansible.python_management.python_management_service.cache_utils.is_syncing', side_effect=self.returns_true):
-            self.assertRaises(APIException, lambda: python_management_service.PythonManagementService().schedule_virtual_environments_update([], python_management))
 
     def test_update_not_possible_to_process_if_is_processing(self):
         python_management = self.fixture.python_management

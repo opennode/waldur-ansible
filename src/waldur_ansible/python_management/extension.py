@@ -1,14 +1,14 @@
+from waldur_ansible.common.extension import AnsibleCommonExtension
+
 from waldur_core.core import WaldurExtension
 
 
 class PythonManagementExtension(WaldurExtension):
     class Settings:
         WALDUR_PYTHON_MANAGEMENT = {
-            'PYTHON_MANAGEMENT_PLAYBOOKS_DIRECTORY': '/usr/share/ansible-waldur/python_management/',
+            'PYTHON_MANAGEMENT_PLAYBOOKS_DIRECTORY': '%swaldur-apps/python_management/' % AnsibleCommonExtension.Settings.WALDUR_ANSIBLE_COMMON['ANSIBLE_LIBRARY'],
             'SYNC_PIP_PACKAGES_TASK_ENABLED': False,
             'SYNC_PIP_PACKAGES_BATCH_SIZE': 300,
-            'PYTHON_MANAGEMENT_ENTRY_POINT_LOCK_TIMEOUT': 120,
-            'PYTHON_MANAGEMENT_TIMEOUT': 3600,
         }
 
     @staticmethod
@@ -35,6 +35,3 @@ class PythonManagementExtension(WaldurExtension):
             },
         }
 
-    @staticmethod
-    def get_public_settings():
-        return ['PYTHON_MANAGEMENT_TIMEOUT']

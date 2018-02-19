@@ -12,9 +12,11 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from model_utils import FieldTracker
 from model_utils.models import TimeStampedModel
+from waldur_ansible.common import models as common_models
 from waldur_ansible.playbook_jobs.backend.ansible_playbook_backend import AnsiblePlaybookBackend
-from waldur_core.core import models as core_models, fields as core_fields
 from waldur_openstack.openstack_tenant import models as openstack_models
+
+from waldur_core.core import models as core_models, fields as core_fields
 
 User = get_user_model()
 
@@ -85,7 +87,7 @@ class Job(core_models.UuidMixin,
           core_models.NameMixin,
           core_models.DescribableMixin,
           TimeStampedModel,
-          models.Model):
+          common_models.ApplicationModel):
     class Meta(object):
         pass
 
