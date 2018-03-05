@@ -2,11 +2,13 @@ import logging
 import xmlrpclib
 
 from celery import shared_task
+from defusedxml import xmlrpc
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 
 from . import models
 
+xmlrpc.monkey_patch()
 logger = logging.getLogger(__name__)
 
 
