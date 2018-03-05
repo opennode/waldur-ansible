@@ -7,8 +7,8 @@ import six
 from django.conf import settings
 from waldur_ansible.playbook_jobs.backend import exceptions
 from waldur_ansible.python_management import models, constants, executors
-from waldur_core.core.views import RefreshTokenMixin
 
+from waldur_core.core.views import RefreshTokenMixin
 from . import output_lines_post_processors, locking_service, extracted_information_handlers, additional_extra_args_builders
 
 logger = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ class PythonManagementBackendHelper(object):
 
     @staticmethod
     def process_output_iterator(command, env):
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1, env=env)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1, env=env)  # nosec
         for stdout_line in iter(process.stdout.readline, ""):
             yield stdout_line
         process.stdout.close()
