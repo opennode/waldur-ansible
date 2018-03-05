@@ -4,8 +4,8 @@ from waldur_core.core import WaldurExtension
 class PythonManagementExtension(WaldurExtension):
     class Settings:
         WALDUR_PYTHON_MANAGEMENT = {
-            'PYTHON_MANAGEMENT_PLAYBOOKS_DIRECTORY': '/etc/waldur/ansible-waldur-module/waldur-apps/python_management/',
-            'SYNC_PIP_PACKAGES_TASK_ENABLED': True,
+            'PYTHON_MANAGEMENT_PLAYBOOKS_DIRECTORY': '/usr/share/ansible-waldur/python_management/',
+            'SYNC_PIP_PACKAGES_TASK_ENABLED': False,
             'SYNC_PIP_PACKAGES_BATCH_SIZE': 300,
             'PYTHON_MANAGEMENT_ENTRY_POINT_LOCK_TIMEOUT': 120,
             'PYTHON_MANAGEMENT_TIMEOUT': 3600,
