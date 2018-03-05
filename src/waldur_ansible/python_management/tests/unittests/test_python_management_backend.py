@@ -78,7 +78,9 @@ class PythonManagementServiceTest(TestCase):
         python_management.instance.image_name = 'debian'
         sync_request = factories.PythonManagementSynchronizeRequestFactory(python_management=python_management, virtual_env_name='virtual-env')
 
-        command = python_management_backend.PythonManagementBackendHelper.build_command(sync_request)
+        module_under_test = 'waldur_ansible.python_management.backend.python_management_backend.'
+        with patch(module_under_test + 'PythonManagementBackendHelper.ensure_playbook_exists_or_raise'):
+            command = python_management_backend.PythonManagementBackendHelper.build_command(sync_request)
 
         self.assertIn('ansible-playbook', command)
         self.assertIn('--extra-vars', command)
