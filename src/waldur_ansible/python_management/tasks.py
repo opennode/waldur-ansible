@@ -1,5 +1,6 @@
 import logging
-import xmlrpclib
+# patched with xmlrpc.monkey_patch() below
+import xmlrpclib  # nosec
 
 from celery import shared_task
 from defusedxml import xmlrpc
