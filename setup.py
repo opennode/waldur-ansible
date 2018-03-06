@@ -16,7 +16,7 @@ install_requires = [
 
 setup(
     name='waldur-ansible',
-    version='0.3.3',
+    version='0.4.0',
     author='OpenNode Team',
     author_email='info@opennodecloud.com',
     url='https://waldur.com',
@@ -31,7 +31,8 @@ setup(
     },
     entry_points={
         'waldur_extensions': (
-            'waldur_ansible = waldur_ansible.extension:AnsibleExtension',
+            'waldur_playbook_jobs = waldur_ansible.playbook_jobs.extension:PlaybookJobsExtension',
+            'waldur_python_management = waldur_ansible.python_management.extension:PythonManagementExtension',
         ),
     },
     include_package_data=True,
