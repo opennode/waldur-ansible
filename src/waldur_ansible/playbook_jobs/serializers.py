@@ -6,9 +6,10 @@ from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
 from waldur_ansible.playbook_jobs import models as playbook_jobs_models
+from waldur_openstack.openstack_tenant import models as openstack_models
+
 from waldur_core.core import models as core_models, serializers as core_serializers, utils as core_utils
 from waldur_core.structure import permissions as structure, serializers as structure_serializers
-from waldur_openstack.openstack_tenant import models as openstack_models
 
 
 class PlaybookParameterSerializer(serializers.ModelSerializer):
@@ -120,6 +121,7 @@ class JobSerializer(core_serializers.AugmentedSerializerMixin,
     arguments = core_serializers.JSONField(default={})
     state = serializers.SerializerMethodField()
     tag = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta(object):
         model = playbook_jobs_models.Job
@@ -129,12 +131,15 @@ class JobSerializer(core_serializers.AugmentedSerializerMixin,
                   'project', 'project_name', 'project_uuid',
                   'playbook', 'playbook_name', 'playbook_uuid',
                   'playbook_image', 'playbook_description',
-                  'arguments', 'state', 'output', 'created', 'modified', 'tag')
-        read_only_fields = ('output', 'created', 'modified')
+                  'arguments', 'state', 'output', 'created', 'modified', 'tag', 'type')
+        read_only_fields = ('output', 'created', 'modified', 'type')
         protected_fields = ('service_project_link', 'ssh_public_key', 'playbook', 'arguments')
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
         }
+
+    def get_type(self, obj):
+        return 'ansible_job'
 
     def get_filtered_field_names(self):
         return 'project', 'service_project_link', 'ssh_public_key'
