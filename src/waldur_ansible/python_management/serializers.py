@@ -7,10 +7,10 @@ from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
 from waldur_ansible.playbook_jobs import models as playbook_jobs_models, serializers as playbook_jobs_serializers
-from waldur_core.core import models as core_models, serializers as core_serializers
-from waldur_core.structure import permissions as structure_permissions, serializers as structure_serializers
 from waldur_openstack.openstack_tenant import models as openstack_models
 
+from waldur_core.core import models as core_models, serializers as core_serializers
+from waldur_core.structure import permissions as structure_permissions, serializers as structure_serializers
 from . import models, utils
 
 REQUEST_TYPES_PLAIN_NAMES = {
@@ -133,17 +133,25 @@ class PythonManagementSerializer(core_serializers.AugmentedSerializerMixin,
             message=_('Virtual environments root directory has invalid format!'),
         ),
     ])
+    name = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta(object):
         model = models.PythonManagement
         fields = ('uuid', 'instance', 'service_project_link', 'virtual_envs_dir_path',
-                  'requests_states', 'created', 'modified', 'virtual_environments', 'python_version')
+                  'requests_states', 'created', 'modified', 'virtual_environments', 'python_version', 'name', 'type')
         protected_fields = ('service_project_link',)
-        read_only_fields = ('request_states', 'created', 'modified', 'python_version')
+        read_only_fields = ('request_states', 'created', 'modified', 'python_version', 'type', 'name')
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
             'instance': {'lookup_field': 'uuid', 'view_name': 'openstacktenant-instance-detail'},
         }
+
+    def get_name(self, python_management):
+        return 'Python Management - %s - %s' % (python_management.instance.name, python_management.virtual_envs_dir_path)
+
+    def get_type(self, python_management):
+        return 'python_management'
 
     def get_filtered_field_names(self):
         return 'service_project_link'
