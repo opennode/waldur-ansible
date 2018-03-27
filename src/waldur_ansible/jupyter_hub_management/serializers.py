@@ -5,7 +5,6 @@ from itertools import chain
 
 from django.core import validators
 from django.db import transaction
-from django.utils import six
 from passlib.hash import sha512_crypt
 from rest_framework import serializers, exceptions
 from waldur_ansible.common import serializers as common_serializers
@@ -208,7 +207,7 @@ class JupyterHubManagementSerializer(
         persisted_oauth_config = None
         if not oauth_config:
             for jupyter_hub_user in validated_data.get('jupyter_hub_users'):
-                jupyter_hub_user['password'] = sha512_crypt.encrypt(jupyter_hub_user['password'])
+                jupyter_hub_user['password'] = sha512_crypt.hash(jupyter_hub_user['password'])
         else:
             persisted_oauth_config = models.JupyterHubOAuthConfig(
                 type=oauth_config['type'],
@@ -253,14 +252,14 @@ class JupyterHubManagementSerializer(
                 corresponding_user.username = jupyter_hub_user['username'].lower()
                 corresponding_user.whitelisted = jupyter_hub_user['whitelisted']
                 if jupyter_hub_user['password']:
-                    corresponding_user.password = sha512_crypt.encrypt(jupyter_hub_user['password'])
+                    corresponding_user.password = sha512_crypt.hash(jupyter_hub_user['password'])
                 corresponding_user.admin = jupyter_hub_user['admin']
                 corresponding_user.save()
             else:
                 new_jupyter_hub_user = models.JupyterHubUser(
                     jupyter_hub_management=instance,
                     username=jupyter_hub_user['username'].lower(),
-                    password=sha512_crypt.encrypt(jupyter_hub_user['password']) if not instance.jupyter_hub_oauth_config else None,
+                    password=sha512_crypt.hash(jupyter_hub_user['password']) if not instance.jupyter_hub_oauth_config else None,
                     admin=jupyter_hub_user['admin'],
                     whitelisted=jupyter_hub_user['whitelisted'])
                 new_jupyter_hub_user.save()
