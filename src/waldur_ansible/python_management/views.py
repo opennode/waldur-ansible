@@ -2,6 +2,7 @@ import logging
 
 from rest_framework import decorators, response
 from rest_framework.viewsets import GenericViewSet
+
 from waldur_ansible.common import serializers as common_serializers
 from waldur_ansible.jupyter_hub_management import models as jupyter_hub_models
 
@@ -32,7 +33,7 @@ class PythonManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsViewS
 
         requests = core_managers.SummaryQuerySet(python_management_requests_models).filter(
             python_management=python_management).order_by("-created")
-        requests_serializer = common_serializers.SummaryPythonManagementRequestsSerializer(
+        requests_serializer = common_serializers.SummaryApplicationSerializer(
             requests, many=True, context={'select_output': False})
 
         return response.Response(
@@ -89,7 +90,7 @@ class PythonManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsViewS
     def find_request_with_output_by_uuid(self, request, uuid=None, request_uuid=None):
         requests = core_managers.SummaryQuerySet(python_management_requests_models).filter(python_management=self.get_object(),
                                                                                            uuid=request_uuid)
-        serializer = common_serializers.SummaryPythonManagementRequestsSerializer(
+        serializer = common_serializers.SummaryApplicationSerializer(
             requests, many=True, context={'select_output': True})
         return response.Response(serializer.data)
 

@@ -51,9 +51,7 @@ class VirtualEnvironmentSerializer(core_serializers.AugmentedSerializerMixin, se
         }
 
 
-class PythonManagementRequestMixin(six.with_metaclass(common_serializers.ApplicationSerializerMetaclass,
-                                                      core_serializers.AugmentedSerializerMixin,
-                                                      serializers.HyperlinkedModelSerializer)):
+class PythonManagementRequestMixin(common_serializers.BaseApplicationSerializer):
     request_type = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
     output = serializers.SerializerMethodField()
@@ -117,11 +115,9 @@ class PythonManagementSynchronizeRequestSerializer(  # PermissionFieldFilteringM
                  + ('libraries_to_install', 'libraries_to_remove', 'virtual_env_name')
 
 
-class PythonManagementSerializer(six.with_metaclass(
-    common_serializers.ApplicationSerializerMetaclass,
-    core_serializers.AugmentedSerializerMixin,
-    structure_serializers.PermissionFieldFilteringMixin,
-    serializers.HyperlinkedModelSerializer)):
+class PythonManagementSerializer(
+    common_serializers.BaseApplicationSerializer,
+    structure_serializers.PermissionFieldFilteringMixin):
     REQUEST_IN_PROGRESS_STATES = (core_models.StateMixin.States.CREATION_SCHEDULED, core_models.StateMixin.States.CREATING)
 
     requests_states = serializers.SerializerMethodField()
@@ -257,7 +253,9 @@ class PythonManagementSerializer(six.with_metaclass(
             raise exceptions.PermissionDenied()
 
 
-class CachedRepositoryPythonLibrarySerializer(core_serializers.AugmentedSerializerMixin, serializers.HyperlinkedModelSerializer):
+class CachedRepositoryPythonLibrarySerializer(
+    core_serializers.AugmentedSerializerMixin,
+    serializers.HyperlinkedModelSerializer  ):
     class Meta(object):
         model = models.CachedRepositoryPythonLibrary
         fields = ('name', 'uuid')

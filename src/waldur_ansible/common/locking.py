@@ -1,3 +1,0 @@
-
-class LockedForProcessingError(Exception):
-    pass

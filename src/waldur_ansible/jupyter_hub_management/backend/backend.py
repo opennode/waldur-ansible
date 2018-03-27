@@ -40,7 +40,8 @@ class JupyterHubManagementBackend(common_backend.ManagementRequestsBackend):
         models.JupyterHubManagementDeleteRequest: extracted_information_handlers.JupyterHubManagementDeleteExtractedInformationHandler,
     }
 
-    LOCKED_FOR_PROCESSING = 'Whole environment or the particular virutal environnment is now being processed, request cannot be executed!'
+    LOCKED_FOR_PROCESSING = 'Whole environment or the particular virtual environment ' \
+                            'is now being processed, request cannot be executed!'
 
     def process_jupyter_hub_management_request(self, jupyter_hub_management_request):
         self.process_request(jupyter_hub_management_request)

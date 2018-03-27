@@ -1,8 +1,10 @@
 import logging
 
 from rest_framework import decorators, response
+
 from waldur_ansible.common import serializers as common_serializers
-from waldur_ansible.python_management import views as python_management_views, serializers as python_management_serializers
+from waldur_ansible.python_management import views as python_management_views
+from waldur_ansible.python_management import serializers as python_management_serializers
 
 from waldur_core.core import views as core_views, managers as core_managers, mixins as core_mixins, models as core_models
 from . import models, serializers, executors, jupyter_hub_management_service
@@ -43,7 +45,7 @@ class JupyterHubManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsV
             .filter(python_management=jupyter_hub_management.python_management) \
             .exclude(state__in=[core_models.StateMixin.States.OK, core_models.StateMixin.States.ERRED]) \
             .order_by("-created")
-        python_management_requests_serializer = common_serializers.SummaryPythonManagementRequestsSerializer(
+        python_management_requests_serializer = common_serializers.SummaryApplicationSerializer(
             python_management_requests, many=True, context={'select_output': False})
         return python_management_requests_serializer.data
 

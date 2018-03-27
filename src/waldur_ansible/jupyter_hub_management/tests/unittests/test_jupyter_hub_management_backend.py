@@ -1,6 +1,7 @@
 from django.test import TestCase
 from mock import patch
-from waldur_ansible.common import locking
+
+from waldur_ansible.common import exceptions
 from waldur_ansible.jupyter_hub_management.backend import backend
 from waldur_ansible.jupyter_hub_management.tests import factories, fixtures
 
@@ -17,7 +18,7 @@ class JupyterHubManagementBackendTest(TestCase):
             sync_request = factories.JupyterHubManagementSyncConfigurationRequestFactory(
                 jupyter_hub_management=self.fixture.jupyter_hub_management)
 
-            self.assertRaises(locking.LockedForProcessingError, jupyter_hub_management_backend.process_jupyter_hub_management_request, sync_request)
+            self.assertRaises(exceptions.LockedForProcessingError, jupyter_hub_management_backend.process_jupyter_hub_management_request, sync_request)
 
             self.assertEqual(sync_request.output, backend.JupyterHubManagementBackend.LOCKED_FOR_PROCESSING)
 

@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 from mock import patch, call
-from waldur_ansible.common import locking
+
+from waldur_ansible.common import exceptions
 from waldur_ansible.python_management.backend import python_management_backend
 from waldur_ansible.python_management.tests import factories, fixtures
 
@@ -66,7 +67,7 @@ class PythonManagementServiceTest(TestCase):
             sync_request = factories.PythonManagementSynchronizeRequestFactory(
                 python_management=python_management, virtual_env_name='virtual-env')
 
-            self.assertRaises(locking.LockedForProcessingError, backend.process_python_management_request, sync_request)
+            self.assertRaises(exceptions.LockedForProcessingError, backend.process_python_management_request, sync_request)
 
             self.assertEqual(sync_request.output, python_management_backend.PythonManagementBackend.LOCKED_FOR_PROCESSING)
 

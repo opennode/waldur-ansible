@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import six
 from rest_framework import serializers
 
 from waldur_core.core import serializers as core_serializers
@@ -30,13 +31,14 @@ class ApplicationSerializerMetaclass(serializers.SerializerMetaclass):
         return serializer
 
 
+class BaseApplicationSerializer(six.with_metaclass(ApplicationSerializerMetaclass,
+                                                   core_serializers.AugmentedSerializerMixin,
+                                                   serializers.HyperlinkedModelSerializer)):
+    class Meta(object):
+        model = NotImplemented
+
+
 class SummaryApplicationSerializer(core_serializers.BaseSummarySerializer):
-    @classmethod
-    def get_serializer(cls, model):
-        return ApplicationSerializerRegistry.get_registered_app_serializer(model)
-
-
-class SummaryPythonManagementRequestsSerializer(core_serializers.BaseSummarySerializer):
     @classmethod
     def get_serializer(cls, model):
         return ApplicationSerializerRegistry.get_registered_app_serializer(model)

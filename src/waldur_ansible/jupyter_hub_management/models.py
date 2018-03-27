@@ -4,12 +4,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
-from django_fsm import FSMIntegerField
 from model_utils.models import TimeStampedModel
+
 from waldur_ansible.common import models as common_models
 from waldur_ansible.python_management import models as python_management_models
-
 from waldur_core.core import models as core_models
 from waldur_core.structure import models as structure_models
 
@@ -27,9 +25,8 @@ class JupyterHubOAuthType(object):
     )
 
 
-@python_2_unicode_compatible
-class JupyterHubOAuthConfig(core_models.UuidMixin, models.Model):
-    type = FSMIntegerField(choices=JupyterHubOAuthType.CHOICES)
+class JupyterHubOAuthConfig(common_models.UuidStrMixin):
+    type = models.PositiveSmallIntegerField(choices=JupyterHubOAuthType.CHOICES)
 
     oauth_callback_url = models.CharField(max_length=255)
     client_id = models.CharField(max_length=255)
@@ -38,12 +35,10 @@ class JupyterHubOAuthConfig(core_models.UuidMixin, models.Model):
     tenant_id = models.CharField(max_length=255, blank=True, null=True)
     gitlab_host = models.CharField(max_length=255, blank=True, null=True)
 
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
 
-
-@python_2_unicode_compatible
-class JupyterHubManagement(core_models.UuidMixin, TimeStampedModel, common_models.ApplicationModel):
+class JupyterHubManagement(common_models.UuidStrMixin,
+                           TimeStampedModel,
+                           common_models.ApplicationModel):
     user = models.ForeignKey(User, related_name='+')
     python_management = models.ForeignKey(python_management_models.PythonManagement, related_name='+')
 
@@ -64,7 +59,7 @@ class JupyterHubManagement(core_models.UuidMixin, TimeStampedModel, common_model
     # holds reference to jupyter_hub_users
 
     class Meta:
-        unique_together = (('instance_content_type', 'instance_object_id',),)
+        unique_together = ('instance_content_type', 'instance_object_id')
 
     class Permissions:
         project_path = 'project'
@@ -80,12 +75,8 @@ class JupyterHubManagement(core_models.UuidMixin, TimeStampedModel, common_model
     def get_whitelisted_users(self):
         return JupyterHubUser.objects.filter(jupyter_hub_management=self, whitelisted=True)
 
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
 
-
-@python_2_unicode_compatible
-class JupyterHubUser(core_models.UuidMixin, models.Model):
+class JupyterHubUser(common_models.UuidStrMixin):
     jupyter_hub_management = models.ForeignKey(JupyterHubManagement, on_delete=models.CASCADE, related_name='jupyter_hub_users')
     admin = models.BooleanField(default=False)
     # plays role only in case of OAuth
@@ -93,11 +84,11 @@ class JupyterHubUser(core_models.UuidMixin, models.Model):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255, null=True, blank=True)
 
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
 
-
-class JupyterHubManagementRequest(core_models.UuidMixin, core_models.StateMixin, TimeStampedModel, common_models.OutputStoring):
+class JupyterHubManagementRequest(common_models.UuidStrMixin,
+                                  core_models.StateMixin,
+                                  TimeStampedModel,
+                                  common_models.OutputMixin):
     jupyter_hub_management = models.ForeignKey(JupyterHubManagement, on_delete=models.CASCADE, related_name='+')
 
     class Meta(object):
@@ -108,32 +99,22 @@ class JupyterHubManagementRequest(core_models.UuidMixin, core_models.StateMixin,
         return JupyterHubManagementBackend()
 
 
-@python_2_unicode_compatible
 class JupyterHubManagementSyncConfigurationRequest(JupyterHubManagementRequest):
-
     # holds make_virtual_env_global_requests reference
-
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
+    pass
 
 
-@python_2_unicode_compatible
-class JupyterHubManagementMakeVirtualEnvironmentGlobalRequest(common_models.RelatedToVirtualEnv, JupyterHubManagementRequest):
+class JupyterHubManagementMakeVirtualEnvironmentGlobalRequest(
+    python_management_models.VirtualEnvMixin,
+    JupyterHubManagementRequest):
     update_configuration_request = models.ForeignKey(JupyterHubManagementSyncConfigurationRequest, related_name="make_virtual_env_global_requests", null=True)
 
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
 
-
-@python_2_unicode_compatible
 class JupyterHubManagementDeleteRequest(JupyterHubManagementRequest):
-
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
+    pass
 
 
-@python_2_unicode_compatible
-class JupyterHubManagementMakeVirtualEnvironmentLocalRequest(common_models.RelatedToVirtualEnv, JupyterHubManagementRequest):
-
-    def __str__(self):
-        return '%s: %s' % (self.__class__.__name__, self.uuid.hex)
+class JupyterHubManagementMakeVirtualEnvironmentLocalRequest(
+    python_management_models.VirtualEnvMixin,
+    JupyterHubManagementRequest):
+    pass

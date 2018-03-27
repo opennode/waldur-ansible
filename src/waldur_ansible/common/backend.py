@@ -5,10 +5,10 @@ import subprocess  # nosec
 
 import six
 from django.conf import settings
+
 from waldur_ansible.common import exceptions
 
 from waldur_core.core.views import RefreshTokenMixin
-from . import locking
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class ManagementRequestsBackend(object):
         if not self.is_processing_allowed(request):
             request.output = self.build_locked_for_processing_message(request)
             request.save(update_fields=['output'])
-            raise locking.LockedForProcessingError('Could not process request %s ' % request)
+            raise exceptions.LockedForProcessingError('Could not process request %s ' % request)
         try:
             self.lock_for_processing(request)
 

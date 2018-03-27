@@ -109,11 +109,9 @@ class JupyterHubOAuthConfigSerializer(core_serializers.AugmentedSerializerMixin,
         return 'type'
 
 
-class JupyterHubManagementSerializer(six.with_metaclass(
-    common_serializers.ApplicationSerializerMetaclass,
-    core_serializers.AugmentedSerializerMixin,
-    structure_serializers.PermissionFieldFilteringMixin,
-    serializers.HyperlinkedModelSerializer)):
+class JupyterHubManagementSerializer(
+    common_serializers.BaseApplicationSerializer,
+    structure_serializers.PermissionFieldFilteringMixin):
     REQUEST_IN_PROGRESS_STATES = (core_models.StateMixin.States.CREATION_SCHEDULED, core_models.StateMixin.States.CREATING)
 
     python_management = serializers.HyperlinkedRelatedField(
