@@ -5,8 +5,8 @@ import subprocess  # nosec
 
 import six
 from django.conf import settings
-from waldur_ansible.common.exceptions import AnsibleBackendError
 
+from waldur_ansible.common.exceptions import AnsibleBackendError
 from waldur_core.core.views import RefreshTokenMixin
 
 logger = logging.getLogger(__name__)
