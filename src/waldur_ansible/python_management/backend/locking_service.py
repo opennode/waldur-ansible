@@ -1,11 +1,9 @@
 from django.conf import settings
+from waldur_ansible.common import cache_utils
 from waldur_ansible.python_management import models
-
-from . import cache_utils
 
 PIP_SYNCING_LOCK = 'waldur_syncing_pip_packages'
 
-PYTHON_MANAGEMENT_ENTRY_POINT_LOCK = 'waldur_python_management_entry_point_%s'
 PYTHON_MANAGEMENT_GLOBAL_LOCK = 'waldur_python_management_global_%s'
 PYTHON_MANAGEMENT_VIRTUAL_ENV_SYNCING_LOCK = 'waldur_python_management_%s_%s'
 
@@ -56,13 +54,13 @@ class RelatedToVirtualEnvSynchronizer(object):
     def lock(self, request):
         virtual_env_lock = PythonManagementBackendLockBuilder.build_related_to_virt_env_lock(
             request.python_management, request.virtual_env_name)
-        cache_utils.renew_task_status(virtual_env_lock, settings.WALDUR_PYTHON_MANAGEMENT['PYTHON_MANAGEMENT_TIMEOUT'])
+        cache_utils.renew_task_status(virtual_env_lock, settings.WALDUR_ANSIBLE_COMMON['ANSIBLE_REQUEST_TIMEOUT'])
 
 
 class GlobalSynchronizer(object):
     def lock(self, request):
         global_lock = PythonManagementBackendLockBuilder.build_global_lock(request.python_management)
-        cache_utils.renew_task_status(global_lock, settings.WALDUR_PYTHON_MANAGEMENT['PYTHON_MANAGEMENT_TIMEOUT'])
+        cache_utils.renew_task_status(global_lock, settings.WALDUR_ANSIBLE_COMMON['ANSIBLE_REQUEST_TIMEOUT'])
 
 
 class PythonManagementBackendLockingService(object):
@@ -135,7 +133,3 @@ class PythonManagementBackendLockBuilder(object):
     @staticmethod
     def build_global_lock(persisted_python_management):
         return PYTHON_MANAGEMENT_GLOBAL_LOCK % persisted_python_management.pk
-
-    @staticmethod
-    def build_entry_point_lock(persisted_python_management):
-        return PYTHON_MANAGEMENT_ENTRY_POINT_LOCK % persisted_python_management.pk

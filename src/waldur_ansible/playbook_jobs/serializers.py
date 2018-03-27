@@ -5,11 +5,16 @@ from zipfile import is_zipfile, ZipFile
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
-from waldur_ansible.playbook_jobs import models as playbook_jobs_models
+
+from waldur_ansible.common import serializers as common_serializers
+from waldur_core.core import models as core_models
+from waldur_core.core import serializers as core_serializers
+from waldur_core.core import utils as core_utils
+from waldur_core.structure import permissions as structure
+from waldur_core.structure import serializers as structure_serializers
 from waldur_openstack.openstack_tenant import models as openstack_models
 
-from waldur_core.core import models as core_models, serializers as core_serializers, utils as core_utils
-from waldur_core.structure import permissions as structure, serializers as structure_serializers
+from . import models as playbook_jobs_models
 
 
 class PlaybookParameterSerializer(serializers.ModelSerializer):
@@ -77,9 +82,8 @@ class PlaybookSerializer(core_serializers.AugmentedSerializerMixin, serializers.
         return playbook
 
 
-class JobSerializer(core_serializers.AugmentedSerializerMixin,
-                    structure_serializers.PermissionFieldFilteringMixin,
-                    serializers.HyperlinkedModelSerializer):
+class JobSerializer(common_serializers.BaseApplicationSerializer,
+                    structure_serializers.PermissionFieldFilteringMixin):
     service_project_link = serializers.HyperlinkedRelatedField(
         lookup_field='pk',
         view_name='openstacktenant-spl-detail',
@@ -139,7 +143,7 @@ class JobSerializer(core_serializers.AugmentedSerializerMixin,
         }
 
     def get_type(self, obj):
-        return 'ansible_job'
+        return 'playbook_job'
 
     def get_filtered_field_names(self):
         return 'project', 'service_project_link', 'ssh_public_key'

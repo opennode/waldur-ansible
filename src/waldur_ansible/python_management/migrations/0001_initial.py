@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import django.utils.timezone
 import django_fsm
 import model_utils.fields
-import waldur_ansible.python_management.models
 from django.conf import settings
 from django.db import migrations, models
 
@@ -77,7 +76,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(waldur_ansible.python_management.models.BackendProcessablePythonManagementRequest, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PythonManagementDeleteVirtualEnvRequest',
@@ -97,7 +96,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(waldur_ansible.python_management.models.BackendProcessablePythonManagementRequest, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PythonManagementFindInstalledLibrariesRequest',
@@ -117,7 +116,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(waldur_ansible.python_management.models.BackendProcessablePythonManagementRequest, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PythonManagementFindVirtualEnvsRequest',
@@ -137,7 +136,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(waldur_ansible.python_management.models.BackendProcessablePythonManagementRequest, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PythonManagementInitializeRequest',
@@ -156,7 +155,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(waldur_ansible.python_management.models.BackendProcessablePythonManagementRequest, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PythonManagementSynchronizeRequest',
@@ -180,7 +179,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=(waldur_ansible.python_management.models.BackendProcessablePythonManagementRequest, models.Model),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='VirtualEnvironment',

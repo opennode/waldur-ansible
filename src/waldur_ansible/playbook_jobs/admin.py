@@ -6,7 +6,8 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from jsoneditor.forms import JSONEditor
-from waldur_ansible.playbook_jobs import models
+
+from . import models
 
 
 class ChangePlaybookParameterInline(admin.TabularInline):

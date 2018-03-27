@@ -5,7 +5,8 @@ import subprocess  # nosec
 
 import six
 from django.conf import settings
-from waldur_ansible.playbook_jobs.backend.exceptions import AnsibleBackendError
+
+from waldur_ansible.common.exceptions import AnsibleBackendError
 from waldur_core.core.views import RefreshTokenMixin
 
 logger = logging.getLogger(__name__)
@@ -20,9 +21,9 @@ class AnsiblePlaybookBackend(object):
         if not os.path.exists(playbook_path):
             raise AnsibleBackendError('Playbook %s does not exist.' % playbook_path)
 
-        command = [settings.WALDUR_PLAYBOOK_JOBS.get('PLAYBOOK_EXECUTION_COMMAND', 'ansible-playbook')]
-        if settings.WALDUR_PLAYBOOK_JOBS.get('PLAYBOOK_ARGUMENTS'):
-            command.extend(settings.WALDUR_PLAYBOOK_JOBS.get('PLAYBOOK_ARGUMENTS'))
+        command = [settings.WALDUR_ANSIBLE_COMMON.get('PLAYBOOK_EXECUTION_COMMAND', 'ansible-playbook')]
+        if settings.WALDUR_ANSIBLE_COMMON.get('PLAYBOOK_ARGUMENTS'):
+            command.extend(settings.WALDUR_ANSIBLE_COMMON.get('PLAYBOOK_ARGUMENTS'))
 
         if check_mode:
             command.append('--check')
@@ -37,12 +38,12 @@ class AnsiblePlaybookBackend(object):
 
     def _get_extra_vars(self, job):
         return dict(
-            api_url=settings.WALDUR_PLAYBOOK_JOBS['API_URL'],
+            api_url=settings.WALDUR_ANSIBLE_COMMON['API_URL'],
             access_token=RefreshTokenMixin().refresh_token(job.user).key,
             project_uuid=job.service_project_link.project.uuid.hex,
             provider_uuid=job.service_project_link.service.uuid.hex,
-            private_key_path=settings.WALDUR_PLAYBOOK_JOBS['PRIVATE_KEY_PATH'],
-            public_key_uuid=settings.WALDUR_PLAYBOOK_JOBS['PUBLIC_KEY_UUID'],
+            private_key_path=settings.WALDUR_ANSIBLE_COMMON['PRIVATE_KEY_PATH'],
+            public_key_uuid=settings.WALDUR_ANSIBLE_COMMON['PUBLIC_KEY_UUID'],
             user_key_uuid=job.ssh_public_key.uuid.hex,
             subnet_uuid=job.subnet.uuid.hex,
             tags=[job.get_tag()],
@@ -55,7 +56,7 @@ class AnsiblePlaybookBackend(object):
         logger.debug('Executing command "%s".', command_str)
         env = dict(
             os.environ,
-            ANSIBLE_LIBRARY=settings.WALDUR_PLAYBOOK_JOBS['ANSIBLE_LIBRARY'],
+            ANSIBLE_LIBRARY=settings.WALDUR_ANSIBLE_COMMON['ANSIBLE_LIBRARY'],
             ANSIBLE_HOST_KEY_CHECKING='False',
         )
         try:
