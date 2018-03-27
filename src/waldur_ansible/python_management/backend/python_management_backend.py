@@ -22,7 +22,7 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
     REQUEST_TYPES_EXTRA_ARGS_CORRESPONDENCE = {
         models.PythonManagementInitializeRequest: None,
         models.PythonManagementSynchronizeRequest: additional_extra_args_builders.build_sync_request_extra_args,
-        models.PythonManagementFindVirtualEnvsRequest: additional_extra_args_builders.build_additional_extra_args,
+        models.PythonManagementFindVirtualEnvsRequest: None,
         models.PythonManagementFindInstalledLibrariesRequest: additional_extra_args_builders.build_additional_extra_args,
         models.PythonManagementDeleteVirtualEnvRequest: additional_extra_args_builders.build_additional_extra_args,
         models.PythonManagementDeleteRequest: None,

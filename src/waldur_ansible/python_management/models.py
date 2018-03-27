@@ -85,7 +85,7 @@ class PythonManagementSynchronizeRequest(VirtualEnvMixin, PythonManagementReques
     initialization_request = models.ForeignKey(PythonManagementInitializeRequest, related_name="sychronization_requests", null=True)
 
 
-class PythonManagementDeleteRequest(VirtualEnvMixin, PythonManagementRequest):
+class PythonManagementDeleteRequest(PythonManagementRequest):
     pass
 
 
@@ -93,7 +93,7 @@ class PythonManagementDeleteVirtualEnvRequest(VirtualEnvMixin, PythonManagementR
     pass
 
 
-class PythonManagementFindVirtualEnvsRequest(VirtualEnvMixin, PythonManagementRequest):
+class PythonManagementFindVirtualEnvsRequest(PythonManagementRequest):
     pass
 
 
