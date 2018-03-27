@@ -6,11 +6,10 @@ from django.core.validators import RegexValidator
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
-from waldur_ansible.playbook_jobs import models as playbook_jobs_models, serializers as playbook_jobs_serializers
-from waldur_openstack.openstack_tenant import models as openstack_models
+from waldur_ansible.common import serializers as common_serializers
 
 from waldur_core.core import models as core_models, serializers as core_serializers
-from waldur_core.structure import permissions as structure_permissions, serializers as structure_serializers
+from waldur_core.structure import permissions as structure_permissions, serializers as structure_serializers, models as structure_models
 from . import models, utils
 
 REQUEST_TYPES_PLAIN_NAMES = {
@@ -44,14 +43,14 @@ class VirtualEnvironmentSerializer(core_serializers.AugmentedSerializerMixin, se
 
     class Meta(object):
         model = models.VirtualEnvironment
-        fields = ('name', 'uuid', 'installed_libraries',)
+        fields = ('name', 'uuid', 'installed_libraries', 'jupyter_hub_global',)
         read_only_fields = ('uuid',)
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
         }
 
 
-class PythonManagementRequestMixin(core_serializers.AugmentedSerializerMixin, serializers.HyperlinkedModelSerializer):
+class PythonManagementRequestMixin(common_serializers.BaseApplicationSerializer):
     request_type = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()
     output = serializers.SerializerMethodField()
@@ -115,16 +114,11 @@ class PythonManagementSynchronizeRequestSerializer(  # PermissionFieldFilteringM
                  + ('libraries_to_install', 'libraries_to_remove', 'virtual_env_name')
 
 
-class PythonManagementSerializer(core_serializers.AugmentedSerializerMixin,
-                                 structure_serializers.PermissionFieldFilteringMixin,
-                                 serializers.HyperlinkedModelSerializer):
+class PythonManagementSerializer(
+    common_serializers.BaseApplicationSerializer,
+    structure_serializers.PermissionFieldFilteringMixin):
     REQUEST_IN_PROGRESS_STATES = (core_models.StateMixin.States.CREATION_SCHEDULED, core_models.StateMixin.States.CREATING)
 
-    service_project_link = serializers.HyperlinkedRelatedField(
-        lookup_field='pk',
-        view_name='openstacktenant-spl-detail',
-        queryset=openstack_models.OpenStackTenantServiceProjectLink.objects.all(),
-    )
     requests_states = serializers.SerializerMethodField()
     virtual_environments = VirtualEnvironmentSerializer(many=True)
     virtual_envs_dir_path = serializers.CharField(max_length=255, validators=[
@@ -136,25 +130,28 @@ class PythonManagementSerializer(core_serializers.AugmentedSerializerMixin,
     name = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
 
+    instance = core_serializers.GenericRelatedField(
+        related_models=structure_models.ResourceMixin.get_all_models(), required=False)
+    instance_name = serializers.ReadOnlyField(source='instance.name')
+
     class Meta(object):
         model = models.PythonManagement
-        fields = ('uuid', 'instance', 'service_project_link', 'virtual_envs_dir_path',
-                  'requests_states', 'created', 'modified', 'virtual_environments', 'python_version', 'name', 'type')
-        protected_fields = ('service_project_link',)
-        read_only_fields = ('request_states', 'created', 'modified', 'python_version', 'type', 'name')
+        fields = ('url', 'uuid', 'virtual_envs_dir_path', 'system_user',
+                  'requests_states', 'created', 'modified', 'virtual_environments', 'python_version', 'name', 'type', 'instance', 'instance_name',)
+        read_only_fields = ('request_states', 'created', 'modified', 'python_version', 'type', 'name', 'url',)
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
-            'instance': {'lookup_field': 'uuid', 'view_name': 'openstacktenant-instance-detail'},
         }
 
     def get_name(self, python_management):
-        return 'Python Management - %s - %s' % (python_management.instance.name, python_management.virtual_envs_dir_path)
+        instance_name = python_management.instance.name if python_management.instance else 'removed instance'
+        return 'Python Management - %s - %s' % (instance_name, python_management.virtual_envs_dir_path)
 
     def get_type(self, python_management):
         return 'python_management'
 
     def get_filtered_field_names(self):
-        return 'service_project_link'
+        return 'project'
 
     def get_requests_states(self, python_management):
         states = []
@@ -224,10 +221,11 @@ class PythonManagementSerializer(core_serializers.AugmentedSerializerMixin,
     def create(self, validated_data):
         python_management = models.PythonManagement(
             user=validated_data.get('user'),
-            instance=validated_data.get('instance'),
-            service_project_link=validated_data.get('service_project_link'),
             virtual_envs_dir_path=validated_data.get('virtual_envs_dir_path'),
-            python_version='3')
+            instance=validated_data.get('instance'),
+            project=validated_data.get('instance').service_project_link.project,
+            python_version='3',
+            system_user=validated_data.get('system_user'))
         python_management.save()
         return python_management
 
@@ -235,50 +233,31 @@ class PythonManagementSerializer(core_serializers.AugmentedSerializerMixin,
         super(PythonManagementSerializer, self).validate(attrs)
         if not self.instance:
             attrs['user'] = self.context['request'].user
+            self.check_resource_type(attrs)
 
         self.check_project_permissions(attrs)
         return attrs
 
+    def check_resource_type(self, attrs):
+        if not issubclass(type(attrs['instance']), structure_models.VirtualMachine):
+            raise exceptions.ValidationError(_('Please specify a virtual machine, not just any resource.'))
+
     def check_project_permissions(self, attrs):
         if self.instance:
-            project = self.instance.service_project_link.project
+            project = self.instance.project
         else:
-            project = attrs['service_project_link'].project
+            project = attrs['instance'].service_project_link.project
 
         if not structure_permissions._has_admin_access(self.context['request'].user, project):
             raise exceptions.PermissionDenied()
 
 
-class CachedRepositoryPythonLibrarySerializer(core_serializers.AugmentedSerializerMixin, serializers.HyperlinkedModelSerializer):
+class CachedRepositoryPythonLibrarySerializer(
+    core_serializers.AugmentedSerializerMixin,
+    serializers.HyperlinkedModelSerializer):
     class Meta(object):
         model = models.CachedRepositoryPythonLibrary
         fields = ('name', 'uuid')
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
         }
-
-
-class SummaryApplicationSerializer(core_serializers.BaseSummarySerializer):
-    @classmethod
-    def get_serializer(cls, model):
-        if model is models.PythonManagement:
-            return PythonManagementSerializer
-        elif model is playbook_jobs_models.Job:
-            return playbook_jobs_serializers.JobSerializer
-
-
-class SummaryPythonManagementRequestsSerializer(core_serializers.BaseSummarySerializer):
-    @classmethod
-    def get_serializer(cls, model):
-        if model is models.PythonManagementInitializeRequest:
-            return PythonManagementInitializeRequestSerializer
-        elif model is models.PythonManagementSynchronizeRequest:
-            return PythonManagementSynchronizeRequestSerializer
-        elif model is models.PythonManagementFindVirtualEnvsRequest:
-            return PythonManagementFindVirtualEnvsRequestSerializer
-        elif model is models.PythonManagementFindInstalledLibrariesRequest:
-            return PythonManagementFindInstalledLibrariesRequestSerializer
-        elif model is models.PythonManagementDeleteRequest:
-            return PythonManagementDeleteRequestSerializer
-        elif model is models.PythonManagementDeleteVirtualEnvRequest:
-            return PythonManagementDeleteVirtualEnvRequestSerializer

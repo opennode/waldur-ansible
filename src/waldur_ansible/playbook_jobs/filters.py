@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
+
 import django_filters
 
-from waldur_ansible.playbook_jobs import models
 from waldur_core.core import filters as core_filters
+
+from . import models
 
 
 class AnsibleJobsFilter(django_filters.FilterSet):

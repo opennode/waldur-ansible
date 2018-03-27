@@ -1,11 +1,16 @@
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 
-from waldur_ansible.playbook_jobs import serializers, executors, filters, models
-from waldur_core.core import exceptions as core_exceptions, mixins as core_mixins, validators as core_validators, views as core_views
+from waldur_core.core import exceptions as core_exceptions
+from waldur_core.core import mixins as core_mixins
+from waldur_core.core import validators as core_validators
+from waldur_core.core import views as core_views
+from waldur_core.structure import filters as structure_filters
+from waldur_core.structure import metadata as structure_metadata
+from waldur_core.structure import models as structure_models
+from waldur_core.structure import permissions as structure_permissions
 
-from waldur_core.structure import models as structure_models, filters as structure_filters, metadata as structure_metadata, \
-    permissions as structure_permissions
+from . import serializers, executors, filters, models
 
 
 class PlaybookViewSet(core_views.ActionsViewSet):

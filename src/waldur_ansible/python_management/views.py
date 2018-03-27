@@ -1,14 +1,14 @@
 import logging
 
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import decorators, response
-from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
-from waldur_ansible.playbook_jobs import models as playbook_jobs_models
-from waldur_core.core import views as core_views, managers as core_managers, mixins as core_mixins
-from waldur_core.structure import views as structure_views, filters as structure_filters
 
-from . import models, serializers, executors, pip_service, python_management_service, filters
+from waldur_ansible.common import serializers as common_serializers
+from waldur_ansible.jupyter_hub_management import models as jupyter_hub_models
+
+from waldur_core.core import views as core_views, managers as core_managers, mixins as core_mixins
+from waldur_core.structure import serializers as core_structure_serializers
+from . import models, serializers, executors, pip_service, python_management_service, utils
 
 python_management_requests_models = [models.PythonManagementInitializeRequest,
                                      models.PythonManagementSynchronizeRequest,
@@ -18,18 +18,6 @@ python_management_requests_models = [models.PythonManagementInitializeRequest,
                                      models.PythonManagementDeleteRequest]
 
 logger = logging.getLogger(__name__)
-
-
-def build_applications_queryset():
-    queryset = core_managers.SummaryQuerySet([playbook_jobs_models.Job, models.PythonManagement])
-    return queryset
-
-
-def get_project_jobs_count(project):
-    return build_applications_queryset().filter(service_project_link__project=project).count()
-
-
-structure_views.ProjectCountersView.register_counter('ansible', get_project_jobs_count)
 
 
 class PythonManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsViewSet):
@@ -45,7 +33,7 @@ class PythonManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsViewS
 
         requests = core_managers.SummaryQuerySet(python_management_requests_models).filter(
             python_management=python_management).order_by("-created")
-        requests_serializer = serializers.SummaryPythonManagementRequestsSerializer(
+        requests_serializer = common_serializers.SummaryApplicationSerializer(
             requests, many=True, context={'select_output': False})
 
         return response.Response(
@@ -102,9 +90,24 @@ class PythonManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsViewS
     def find_request_with_output_by_uuid(self, request, uuid=None, request_uuid=None):
         requests = core_managers.SummaryQuerySet(python_management_requests_models).filter(python_management=self.get_object(),
                                                                                            uuid=request_uuid)
-        serializer = serializers.SummaryPythonManagementRequestsSerializer(
+        serializer = common_serializers.SummaryApplicationSerializer(
             requests, many=True, context={'select_output': True})
         return response.Response(serializer.data)
+
+    @decorators.list_route(url_path="validForJupyterHub", methods=['get'])
+    def find_valid_for_jupyter_hub_python_managements_with_instance_info(self, request):
+        result = super(PythonManagementViewSet, self).list(request)
+        result.data = filter(
+            lambda pm: not utils.execute_safely(
+                lambda: jupyter_hub_models.JupyterHubManagement.objects.get(python_management__uuid=pm['uuid'])),
+            result.data)
+
+        for python_management in result.data:
+            instance = models.PythonManagement.objects.get(uuid=python_management['uuid']).instance
+            instance_serializer = core_structure_serializers.SummaryResourceSerializer(instance=instance, context={'request': request})
+            python_management['instance'] = instance_serializer.data
+
+        return result
 
 
 class PipPackagesViewSet(GenericViewSet):
@@ -121,11 +124,3 @@ class PipPackagesViewSet(GenericViewSet):
         serializer = serializers.CachedRepositoryPythonLibrarySerializer(matching_libraries, many=True)
 
         return response.Response(serializer.data)
-
-
-class ApplicationsSummaryViewSet(ListModelMixin, GenericViewSet):
-    serializer_class = serializers.SummaryApplicationSerializer
-    filter_backends = (structure_filters.GenericRoleFilter, filters.ApplicationSummaryFilterBackend, DjangoFilterBackend)
-
-    def get_queryset(self):
-        return build_applications_queryset()

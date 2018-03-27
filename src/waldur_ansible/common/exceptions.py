@@ -25,3 +25,7 @@ class AnsibleBackendError(Exception):
                 args[i] = six.text_type(arg)
 
         super(AnsibleBackendError, self).__init__(*args, **kwargs)
+
+
+class LockedForProcessingError(Exception):
+    pass

@@ -1,10 +1,10 @@
-from django.conf import settings
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.status import HTTP_202_ACCEPTED, HTTP_423_LOCKED
-from waldur_ansible.python_management.backend import locking_service, cache_utils
-from waldur_core.core.models import StateMixin
+from waldur_ansible.common import cache_utils
+from waldur_ansible.python_management.backend import locking_service
 
+from waldur_core.core.models import StateMixin
 from . import models, executors
 
 
@@ -28,77 +28,51 @@ class PythonManagementService(object):
             status=HTTP_423_LOCKED)
 
     def schedule_python_management_removal(self, persisted_python_management):
-        entry_point_lock = self.acquire_entry_point_lock_or_raise(persisted_python_management)
+        delete_request = models.PythonManagementDeleteRequest(python_management=persisted_python_management)
 
-        try:
-            delete_request = models.PythonManagementDeleteRequest(python_management=persisted_python_management)
-
-            if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(delete_request):
-                raise APIException(code=HTTP_423_LOCKED)
-
-            delete_request.save()
-            self.executor.execute(delete_request, async=True)
-        finally:
-            cache_utils.release_task_status(entry_point_lock)
-
-    def acquire_entry_point_lock_or_raise(self, persisted_python_management):
-        entry_point_lock = locking_service.PythonManagementBackendLockBuilder.build_entry_point_lock(persisted_python_management)
-        if cache_utils.is_syncing(entry_point_lock):
+        if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(delete_request):
             raise APIException(code=HTTP_423_LOCKED)
-        cache_utils.renew_task_status(entry_point_lock, settings.WALDUR_PYTHON_MANAGEMENT['PYTHON_MANAGEMENT_ENTRY_POINT_LOCK_TIMEOUT'])
-        return entry_point_lock
+
+        delete_request.save()
+        self.executor.execute(delete_request, async=True)
 
     def schedule_virtual_environments_search(self, persisted_python_management):
-        entry_point_lock = self.acquire_entry_point_lock_or_raise(persisted_python_management)
+        find_virtual_envs_request = models.PythonManagementFindVirtualEnvsRequest(python_management=persisted_python_management)
 
-        try:
-            find_virtual_envs_request = models.PythonManagementFindVirtualEnvsRequest(python_management=persisted_python_management)
+        if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(find_virtual_envs_request):
+            raise APIException(code=HTTP_423_LOCKED)
 
-            if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(find_virtual_envs_request):
-                raise APIException(code=HTTP_423_LOCKED)
-
-            find_virtual_envs_request.save()
-            self.executor.execute(find_virtual_envs_request, async=True)
-            return Response({'status': 'Find installed virtual environments process has been scheduled.'},
-                            status=HTTP_202_ACCEPTED)
-        finally:
-            cache_utils.release_task_status(entry_point_lock)
+        find_virtual_envs_request.save()
+        self.executor.execute(find_virtual_envs_request, async=True)
+        return Response({'status': 'Find installed virtual environments process has been scheduled.'},
+                        status=HTTP_202_ACCEPTED)
 
     def schedule_installed_libraries_search(self, persisted_python_management, virtual_env_name):
-        entry_point_lock = self.acquire_entry_point_lock_or_raise(persisted_python_management)
+        find_installed_libraries_request = models.PythonManagementFindInstalledLibrariesRequest(
+            python_management=persisted_python_management, virtual_env_name=virtual_env_name)
 
-        try:
-            find_installed_libraries_request = models.PythonManagementFindInstalledLibrariesRequest(
-                python_management=persisted_python_management, virtual_env_name=virtual_env_name)
+        if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(find_installed_libraries_request):
+            raise APIException(code=HTTP_423_LOCKED)
 
-            if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(find_installed_libraries_request):
-                raise APIException(code=HTTP_423_LOCKED)
-
-            find_installed_libraries_request.save()
-            self.executor.execute(find_installed_libraries_request, async=True)
-            return Response(
-                {'status': 'Find installed libraries in virtual environment process has been scheduled.'},
-                status=HTTP_202_ACCEPTED)
-        finally:
-            cache_utils.release_task_status(entry_point_lock)
+        find_installed_libraries_request.save()
+        self.executor.execute(find_installed_libraries_request, async=True)
+        return Response(
+            {'status': 'Find installed libraries in virtual environment process has been scheduled.'},
+            status=HTTP_202_ACCEPTED)
 
     def schedule_virtual_environments_update(self, all_transient_virtual_environments, persisted_python_management):
         persisted_virtual_environments = persisted_python_management.virtual_environments.all()
-        entry_point_lock = self.acquire_entry_point_lock_or_raise(persisted_python_management)
-        try:
-            virtual_environments_to_create, virtual_environments_to_change, removed_virtual_environments = \
-                self.identify_changed_created_removed_envs(
-                    all_transient_virtual_environments, persisted_virtual_environments)
+        virtual_environments_to_create, virtual_environments_to_change, removed_virtual_environments = \
+            self.identify_changed_created_removed_envs(
+                all_transient_virtual_environments, persisted_virtual_environments)
 
-            if cache_utils.is_syncing(
-                    locking_service.PythonManagementBackendLockBuilder.build_global_lock(persisted_python_management)):
-                raise APIException(code=HTTP_423_LOCKED)
+        if cache_utils.is_syncing(
+                locking_service.PythonManagementBackendLockBuilder.build_global_lock(persisted_python_management)):
+            raise APIException(code=HTTP_423_LOCKED)
 
-            self.create_or_refuse_requests(
-                persisted_python_management, removed_virtual_environments,
-                virtual_environments_to_change, virtual_environments_to_create)
-        finally:
-            cache_utils.release_task_status(entry_point_lock)
+        self.create_or_refuse_requests(
+            persisted_python_management, removed_virtual_environments,
+            virtual_environments_to_change, virtual_environments_to_create)
 
     def identify_changed_created_removed_envs(self, all_transient_virtual_environments, persisted_virtual_environments):
 

@@ -2,6 +2,7 @@ from cStringIO import StringIO
 
 from PIL import Image
 from django.conf import settings
+
 from waldur_ansible.playbook_jobs import tasks
 
 

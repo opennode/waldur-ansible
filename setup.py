@@ -11,12 +11,13 @@ tests_requires = [
 install_requires = [
     'waldur-core>=0.151.0',
     'waldur-openstack>=0.38.2',
+    'passlib>=1.7.0',
 ]
 
 
 setup(
     name='waldur-ansible',
-    version='0.4.0',
+    version='0.5.0',
     author='OpenNode Team',
     author_email='info@opennodecloud.com',
     url='https://waldur.com',
@@ -31,8 +32,10 @@ setup(
     },
     entry_points={
         'waldur_extensions': (
+            'waldur_common = waldur_ansible.common.extension:AnsibleCommonExtension',
             'waldur_playbook_jobs = waldur_ansible.playbook_jobs.extension:PlaybookJobsExtension',
             'waldur_python_management = waldur_ansible.python_management.extension:PythonManagementExtension',
+            'waldur_jupyter_hub_management = waldur_ansible.jupyter_hub_management.extension:JupyterHubManagementExtension',
         ),
     },
     include_package_data=True,
