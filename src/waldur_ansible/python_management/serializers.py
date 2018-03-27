@@ -4,7 +4,6 @@ import datetime
 
 from django.core.validators import RegexValidator
 from django.db import transaction
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
 from waldur_ansible.common import serializers as common_serializers
@@ -255,7 +254,7 @@ class PythonManagementSerializer(
 
 class CachedRepositoryPythonLibrarySerializer(
     core_serializers.AugmentedSerializerMixin,
-    serializers.HyperlinkedModelSerializer  ):
+    serializers.HyperlinkedModelSerializer):
     class Meta(object):
         model = models.CachedRepositoryPythonLibrary
         fields = ('name', 'uuid')
