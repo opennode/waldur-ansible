@@ -119,7 +119,7 @@ class PythonManagementSerializer(
     structure_serializers.PermissionFieldFilteringMixin):
     REQUEST_IN_PROGRESS_STATES = (core_models.StateMixin.States.CREATION_SCHEDULED, core_models.StateMixin.States.CREATING)
 
-    requests_states = serializers.SerializerMethodField()
+    state = serializers.SerializerMethodField()
     virtual_environments = VirtualEnvironmentSerializer(many=True)
     virtual_envs_dir_path = serializers.CharField(max_length=255, validators=[
         RegexValidator(
@@ -137,7 +137,7 @@ class PythonManagementSerializer(
     class Meta(object):
         model = models.PythonManagement
         fields = ('url', 'uuid', 'virtual_envs_dir_path', 'system_user',
-                  'requests_states', 'created', 'modified', 'virtual_environments', 'python_version', 'name', 'type', 'instance', 'instance_name',)
+                  'state', 'created', 'modified', 'virtual_environments', 'python_version', 'name', 'type', 'instance', 'instance_name',)
         read_only_fields = ('request_states', 'created', 'modified', 'python_version', 'type', 'name', 'url',)
         extra_kwargs = {
             'url': {'lookup_field': 'uuid'},
@@ -153,7 +153,7 @@ class PythonManagementSerializer(
     def get_filtered_field_names(self):
         return 'project'
 
-    def get_requests_states(self, python_management):
+    def get_state(self, python_management):
         states = []
         initialize_request = utils.execute_safely(
             lambda: models.PythonManagementInitializeRequest.objects.filter(python_management=python_management).latest('id'))
@@ -164,21 +164,29 @@ class PythonManagementSerializer(
         states.extend(self.build_states_from_last_group_of_the_request(python_management, models.PythonManagementSynchronizeRequest))
 
         if not states:
-            states.append(self.build_state(python_management, state=core_models.StateMixin(state=core_models.StateMixin.States.OK)))
-
-        return states
+            return core_models.StateMixin(state=core_models.StateMixin.States.OK).human_readable_state
+        else:
+            creation_scheduled_state = core_models.StateMixin(state=core_models.StateMixin.States.CREATION_SCHEDULED).human_readable_state
+            creating_state = core_models.StateMixin(state=core_models.StateMixin.States.CREATING).human_readable_state
+            erred_state = core_models.StateMixin(state=core_models.StateMixin.States.ERRED).human_readable_state
+            if creating_state in states:
+                return creating_state
+            elif creation_scheduled_state in states:
+                return creation_scheduled_state
+            elif erred_state in states:
+                return erred_state
 
     def build_search_requests_states(self, python_management):
         states = []
         states.extend(
-            self.get_state(
+            self.get_request_state(
                 utils.execute_safely(
                     lambda: models.PythonManagementFindVirtualEnvsRequest.objects
                         .filter(python_management=python_management).latest('id'))))
         states.extend(self.build_states_from_last_group_of_the_request(python_management, models.PythonManagementFindInstalledLibrariesRequest))
         return states
 
-    def get_state(self, request):
+    def get_request_state(self, request):
         if request and self.is_in_progress_or_errored(request):
             return [self.build_state(request)]
         else:
@@ -212,10 +220,7 @@ class PythonManagementSerializer(
 
     def build_state(self, request, state=None):
         request_state = state if state else request
-        return {
-            'state': request_state.human_readable_state,
-            'request_type': REQUEST_TYPES_PLAIN_NAMES.get(type(request))
-        }
+        return request_state.human_readable_state
 
     @transaction.atomic
     def create(self, validated_data):
