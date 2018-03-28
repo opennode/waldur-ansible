@@ -118,7 +118,7 @@ class JupyterHubManagementSerializer(
         view_name='python_management-detail',
         queryset=python_management_models.PythonManagement.objects.all(),
     )
-    requests_states = serializers.SerializerMethodField()
+    state = serializers.SerializerMethodField()
     jupyter_hub_users = JupyterHubUserSerializer(many=True)
     jupyter_hub_oauth_config = JupyterHubOAuthConfigSerializer(allow_null=True)
     updated_virtual_environments = python_management_serializers.VirtualEnvironmentSerializer(many=True, write_only=True)
@@ -127,7 +127,7 @@ class JupyterHubManagementSerializer(
 
     class Meta(object):
         model = models.JupyterHubManagement
-        fields = ('uuid', 'python_management', 'jupyter_hub_users', 'requests_states', 'session_time_to_live_hours',
+        fields = ('uuid', 'python_management', 'jupyter_hub_users', 'state', 'session_time_to_live_hours',
                   'created', 'modified', 'updated_virtual_environments', 'name', 'jupyter_hub_url', 'jupyter_hub_oauth_config',)
         read_only_fields = ('request_states', 'created', 'modified', 'jupyter_hub_url',)
         extra_kwargs = {
@@ -145,7 +145,7 @@ class JupyterHubManagementSerializer(
         instance_name = jupyter_hub_management.instance.name if jupyter_hub_management.instance else 'removed instance'
         return 'JupyterHub - %s - %s' % (jupyter_hub_management.python_management.virtual_envs_dir_path, instance_name)
 
-    def get_requests_states(self, jupyter_hub_management):
+    def get_state(self, jupyter_hub_management):
         states = []
         configuration_request = pythhon_management_utils.execute_safely(
             lambda: models.JupyterHubManagementSyncConfigurationRequest.objects.filter(jupyter_hub_management=jupyter_hub_management).latest('id'))
@@ -155,15 +155,17 @@ class JupyterHubManagementSerializer(
         states.extend(self.build_states_from_last_group_of_the_request(jupyter_hub_management))
 
         if not states:
-            states.append(self.build_state(jupyter_hub_management, state=core_models.StateMixin(state=core_models.StateMixin.States.OK)))
-
-        return states
-
-    def get_state(self, request):
-        if request and self.is_in_progress_or_errored(request):
-            return [self.build_state(request)]
+            return core_models.StateMixin(state=core_models.StateMixin.States.OK).human_readable_state
         else:
-            return []
+            creation_scheduled_state = core_models.StateMixin(state=core_models.StateMixin.States.CREATION_SCHEDULED).human_readable_state
+            creating_state = core_models.StateMixin(state=core_models.StateMixin.States.CREATING).human_readable_state
+            erred_state = core_models.StateMixin(state=core_models.StateMixin.States.ERRED).human_readable_state
+            if creating_state in states:
+                return creating_state
+            elif creation_scheduled_state in states:
+                return creation_scheduled_state
+            elif erred_state in states:
+                return erred_state
 
     def build_states_from_last_group_of_the_request(self, jupyter_hub_management):
         states = []
@@ -196,10 +198,7 @@ class JupyterHubManagementSerializer(
 
     def build_state(self, request, state=None):
         request_with_state = state if state else request
-        return {
-            'state': request_with_state.human_readable_state,
-            'request_type': REQUEST_TYPES_PLAIN_NAMES.get(type(request))
-        }
+        return request_with_state.human_readable_state
 
     @transaction.atomic
     def create(self, validated_data):
