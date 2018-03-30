@@ -9,7 +9,8 @@ def build_virtual_env_extra_args(jupyter_hub_virtual_env_request):
 
 def build_delete_jupyter_hub_extra_args(delete_jupyter_hub_request):
     return dict(
-        all_jupyterhub_users=map(lambda u: u.username, delete_jupyter_hub_request.jupyter_hub_management.jupyter_hub_users.all())
+        all_jupyterhub_users=map(lambda u: u.username, delete_jupyter_hub_request.jupyter_hub_management.jupyter_hub_users.all()),
+        first_admin_username=delete_jupyter_hub_request.jupyter_hub_management.get_admin_users()[0].username
     )
 
 

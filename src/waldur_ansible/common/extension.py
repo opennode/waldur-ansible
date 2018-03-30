@@ -7,7 +7,7 @@ class AnsibleCommonExtension(WaldurExtension):
             'PLAYBOOK_EXECUTION_COMMAND': 'ansible-playbook',
             'PLAYBOOK_ARGUMENTS': ['--verbose'],
             'API_URL': 'https://waldur.example.com/api/',
-            'PRIVATE_KEY_PATH': 'Set here the path to the private key on Waldur Celery worker node',
+            'PRIVATE_KEY_PATH': '/etc/waldur/id_rsa',
             'PUBLIC_KEY_UUID': 'Corresponding public key should be stored in the database. Specify here its UUID.',
             'ANSIBLE_REQUEST_TIMEOUT': 3600,
             'ANSIBLE_LIBRARY': '/usr/share/ansible-waldur/',

@@ -139,7 +139,7 @@ class JupyterHubManagementSerializer(
 
     def get_jupyter_hub_url(self, jupyter_hub_management):
         instance_floating_ips = jupyter_hub_management.instance.floating_ips if jupyter_hub_management.instance else None
-        return instance_floating_ips[0].name if instance_floating_ips else None
+        return instance_floating_ips[0].address if instance_floating_ips else None
 
     def get_name(self, jupyter_hub_management):
         instance_name = jupyter_hub_management.instance.name if jupyter_hub_management.instance else 'removed instance'
