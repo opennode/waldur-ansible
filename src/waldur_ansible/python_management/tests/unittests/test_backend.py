@@ -27,7 +27,7 @@ class PythonManagementServiceTest(TestCase):
             python_management=self.fixture.python_management, virtual_env_name='virtual-env')]
 
         with patch(self.module_path + 'executors.PythonManagementRequestExecutor.execute') as mocked_execute, \
-                patch(self.module_path + 'PythonManagementBackend.process_request') as mocked_process_request:
+                patch(self.module_path + 'PythonManagementBackend.process_request'):
             backend_under_test.process_python_management_request(init_request)
             mocked_execute.assert_called_once()
 

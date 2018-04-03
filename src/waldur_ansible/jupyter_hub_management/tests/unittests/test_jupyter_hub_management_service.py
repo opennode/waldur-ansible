@@ -60,7 +60,7 @@ class JupyterHubManagementServiceTest(TestCase):
 
         module_under_test = 'waldur_ansible.jupyter_hub_management.jupyter_hub_management_service.'
         with patch(module_under_test + 'locking_service.JupyterHubManagementBackendLockingService.is_processing_allowed') as is_processing_allowed_mock, \
-                patch(module_under_test + 'executors.JupyterHubManagementRequestExecutor.execute') as executor_mock:
+                patch(module_under_test + 'executors.JupyterHubManagementRequestExecutor.execute'):
             is_processing_allowed_mock.return_value = False
 
             self.assertRaises(APIException, jupyter_hub_management_service.JupyterHubManagementService().schedule_jupyter_hub_management_removal, jupyter_hub_management)

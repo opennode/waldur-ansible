@@ -14,9 +14,9 @@ def find_versions(queried_library_name, python_version):
 
     for release_version, release_info in lib_info['releases'].viewitems():
         for platform_version in release_info:
-            if not contains_any_string(platform_version['filename'], wrong_os_versions) \
-                    and (contains_any_string(platform_version['python_version'], python_versions)
-                         or version_not_specified(platform_version['filename'])):
+            if not contains_any_string(platform_version['filename'], wrong_os_versions) and\
+                    (contains_any_string(platform_version['python_version'], python_versions) or
+                     version_not_specified(platform_version['filename'])):
                 version_upload_date_pairs.append(dict(version=release_version, upload_date=platform_version['upload_time']))
                 break
 
@@ -46,8 +46,8 @@ def version_not_specified(python_version):
 
 
 def contains_any_string(target_string, strings):
-    for string in strings:
-        if string in target_string:
+    for item in strings:
+        if item in target_string:
             return True
     return False
 

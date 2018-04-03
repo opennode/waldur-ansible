@@ -74,8 +74,8 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
 
     def get_playbook_path(self, request):
         return settings.WALDUR_PYTHON_MANAGEMENT.get('PYTHON_MANAGEMENT_PLAYBOOKS_DIRECTORY') \
-               + PythonManagementBackend.REQUEST_TYPES_PLAYBOOKS_CORRESPONDENCE.get(type(request)) \
-               + '.yml'
+            + PythonManagementBackend.REQUEST_TYPES_PLAYBOOKS_CORRESPONDENCE.get(type(request)) \
+            + '.yml'
 
     def get_user(self, request):
         return request.python_management.user

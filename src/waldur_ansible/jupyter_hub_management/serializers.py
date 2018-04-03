@@ -109,8 +109,8 @@ class JupyterHubOAuthConfigSerializer(core_serializers.AugmentedSerializerMixin,
 
 
 class JupyterHubManagementSerializer(
-    common_serializers.BaseApplicationSerializer,
-    structure_serializers.PermissionFieldFilteringMixin):
+        common_serializers.BaseApplicationSerializer,
+        structure_serializers.PermissionFieldFilteringMixin):
     REQUEST_IN_PROGRESS_STATES = (core_models.StateMixin.States.CREATION_SCHEDULED, core_models.StateMixin.States.CREATING)
 
     python_management = serializers.HyperlinkedRelatedField(
@@ -194,7 +194,7 @@ class JupyterHubManagementSerializer(
 
     def is_in_progress_or_errored(self, request):
         return request.state in JupyterHubManagementSerializer.REQUEST_IN_PROGRESS_STATES \
-               or request.state == core_models.StateMixin.States.ERRED
+            or request.state == core_models.StateMixin.States.ERRED
 
     def build_state(self, request, state=None):
         request_with_state = state if state else request
