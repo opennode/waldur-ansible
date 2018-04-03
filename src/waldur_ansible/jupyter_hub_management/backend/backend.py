@@ -67,8 +67,8 @@ class JupyterHubManagementBackend(common_backend.ManagementRequestsBackend):
 
     def get_playbook_path(self, request):
         return settings.WALDUR_JUPYTER_HUB_MANAGEMENT.get('JUPYTER_MANAGEMENT_PLAYBOOKS_DIRECTORY') \
-               + JupyterHubManagementBackend.REQUEST_TYPES_PLAYBOOKS_MAP.get(type(request)) \
-               + '.yml'
+            + JupyterHubManagementBackend.REQUEST_TYPES_PLAYBOOKS_MAP.get(type(request)) \
+            + '.yml'
 
     def get_user(self, request):
         return request.jupyter_hub_management.python_management.user

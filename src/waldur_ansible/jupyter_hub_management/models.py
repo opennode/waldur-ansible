@@ -105,8 +105,8 @@ class JupyterHubManagementSyncConfigurationRequest(JupyterHubManagementRequest):
 
 
 class JupyterHubManagementMakeVirtualEnvironmentGlobalRequest(
-    python_management_models.VirtualEnvMixin,
-    JupyterHubManagementRequest):
+        python_management_models.VirtualEnvMixin,
+        JupyterHubManagementRequest):
     update_configuration_request = models.ForeignKey(JupyterHubManagementSyncConfigurationRequest, related_name="make_virtual_env_global_requests", null=True)
 
 
@@ -115,6 +115,6 @@ class JupyterHubManagementDeleteRequest(JupyterHubManagementRequest):
 
 
 class JupyterHubManagementMakeVirtualEnvironmentLocalRequest(
-    python_management_models.VirtualEnvMixin,
-    JupyterHubManagementRequest):
+        python_management_models.VirtualEnvMixin,
+        JupyterHubManagementRequest):
     pass

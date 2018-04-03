@@ -9,4 +9,4 @@ class DeleteRequestErrorHandler(object):
 
     def exists_failed_initialization_request(self, jupyter_hub_management):
         return models.JupyterHubManagementSyncConfigurationRequest.objects.filter(jupyter_hub_management=jupyter_hub_management).latest('id').state \
-               == core_models.StateMixin.States.ERRED
+            == core_models.StateMixin.States.ERRED
