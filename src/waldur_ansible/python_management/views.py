@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import decorators, response
 from rest_framework.viewsets import GenericViewSet
 
-from waldur_ansible.common import serializers as common_serializers, filters as common_filters
+from waldur_ansible.common import serializers as common_serializers
 from waldur_ansible.jupyter_hub_management import models as jupyter_hub_models
 
 from waldur_core.core import views as core_views, managers as core_managers, mixins as core_mixins
