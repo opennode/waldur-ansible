@@ -42,7 +42,7 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
         models.PythonManagementSynchronizeRequest: extracted_information_handlers.InstalledLibrariesExtractedInformationHandler,
         models.PythonManagementFindVirtualEnvsRequest: extracted_information_handlers.PythonManagementFindVirtualEnvsRequestExtractedInformationHandler,
         models.PythonManagementFindInstalledLibrariesRequest: extracted_information_handlers.InstalledLibrariesExtractedInformationHandler,
-        models.PythonManagementDeleteVirtualEnvRequest: extracted_information_handlers.NullExtractedInformationHandler,
+        models.PythonManagementDeleteVirtualEnvRequest: extracted_information_handlers.PythonManagementDeleteVirtualEnvExtractedInformationHandler,
         models.PythonManagementDeleteRequest: extracted_information_handlers.PythonManagementDeletionRequestExtractedInformationHandler,
     }
 

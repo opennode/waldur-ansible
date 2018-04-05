@@ -52,9 +52,19 @@ class PythonManagementDeletionRequestExtractedInformationHandler(object):
         request.python_management.delete()
 
 
+class PythonManagementDeleteVirtualEnvExtractedInformationHandler(object):
+    def handle_extracted_information(self, request, lines_post_processor):
+        request.python_management.virtual_environments.get(name=request.virtual_env_name).delete()
+
+
 class PythonManagementFindVirtualEnvsRequestExtractedInformationHandler(object):
     def handle_extracted_information(self, request, lines_post_processor):
+        for persisted_virtual_env in request.python_management.virtual_environments.all():
+            if persisted_virtual_env not in lines_post_processor.installed_virtual_environments:
+                persisted_virtual_env.delete()
+
         locking_service.PythonManagementBackendLockingService.handle_on_processing_finished(request)
+
         for virtual_env_name in lines_post_processor.installed_virtual_environments:
             find_libs_request = models.PythonManagementFindInstalledLibrariesRequest.objects.create(
                 python_management=request.python_management, virtual_env_name=virtual_env_name)

@@ -152,6 +152,9 @@ class JupyterHubManagementSerializer(
         if configuration_request and self.is_in_progress_or_errored(configuration_request):
             return [self.build_state(configuration_request)]
 
+        states.extend(self.get_request_state(
+            pythhon_management_utils.execute_safely(
+                lambda: models.JupyterHubManagementDeleteRequest.objects.filter(jupyter_hub_management=jupyter_hub_management).latest('id'))))
         states.extend(self.build_states_from_last_group_of_the_request(jupyter_hub_management))
 
         if not states:
@@ -178,6 +181,12 @@ class JupyterHubManagementSerializer(
             if self.is_in_progress_or_errored(request):
                 states.append(self.build_state(request))
         return states
+
+    def get_request_state(self, request):
+        if request and self.is_in_progress_or_errored(request):
+            return [self.build_state(request)]
+        else:
+            return []
 
     def get_last_requests_group(self, requests):
         last_request_group = []
@@ -208,6 +217,9 @@ class JupyterHubManagementSerializer(
             for jupyter_hub_user in validated_data.get('jupyter_hub_users'):
                 jupyter_hub_user['password'] = sha512_crypt.hash(jupyter_hub_user['password'])
         else:
+            for jupyter_hub_user in validated_data.get('jupyter_hub_users'):
+                # NB! Should be consistent with JupyterHub configuration located in jupyterhub_config.py.j2
+                self.normalize_username(jupyter_hub_user)
             persisted_oauth_config = models.JupyterHubOAuthConfig(
                 type=oauth_config['type'],
                 oauth_callback_url=oauth_config['oauth_callback_url'],
@@ -245,10 +257,11 @@ class JupyterHubManagementSerializer(
             removed_jupyter_hub_user.delete()
 
         for jupyter_hub_user in jupyter_hub_users:
+            self.normalize_username(jupyter_hub_user)
             corresponding_persisted_user = self.find_corresponding_persisted_jupyter_hub_user(persisted_jupyter_hub_users, jupyter_hub_user['username'])
             if corresponding_persisted_user:
                 corresponding_user = corresponding_persisted_user[0]
-                corresponding_user.username = jupyter_hub_user['username'].lower()
+                corresponding_user.username = jupyter_hub_user['username']
                 corresponding_user.whitelisted = jupyter_hub_user['whitelisted']
                 if jupyter_hub_user['password']:
                     corresponding_user.password = sha512_crypt.hash(jupyter_hub_user['password'])
@@ -257,7 +270,7 @@ class JupyterHubManagementSerializer(
             else:
                 new_jupyter_hub_user = models.JupyterHubUser(
                     jupyter_hub_management=instance,
-                    username=jupyter_hub_user['username'].lower(),
+                    username=jupyter_hub_user['username'],
                     password=sha512_crypt.hash(jupyter_hub_user['password']) if not instance.jupyter_hub_oauth_config else None,
                     admin=jupyter_hub_user['admin'],
                     whitelisted=jupyter_hub_user['whitelisted'])
@@ -276,6 +289,9 @@ class JupyterHubManagementSerializer(
         instance.save()
 
         return instance
+
+    def normalize_username(self, jupyter_hub_user):
+        jupyter_hub_user['username'] = ''.join(c if c.isalnum() else '_' for c in jupyter_hub_user['username'].lower())
 
     def find_corresponding_persisted_jupyter_hub_user(self, persisted_jupyter_hub_users, username):
         return filter(lambda u: u.username == username.lower(), persisted_jupyter_hub_users)
