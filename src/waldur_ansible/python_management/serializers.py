@@ -162,6 +162,10 @@ class PythonManagementSerializer(
 
         states.extend(self.get_request_state(
             utils.execute_safely(lambda: models.PythonManagementDeleteRequest.objects.filter(python_management=python_management).latest('id'))))
+        states.extend(
+            self.get_request_state(
+                utils.execute_safely(
+                    lambda: models.PythonManagementDeleteVirtualEnvRequest.objects.filter(python_management=python_management).latest('id'))))
         states.extend(self.build_search_requests_states(python_management))
         states.extend(self.build_states_from_last_group_of_the_request(python_management, models.PythonManagementSynchronizeRequest))
 
