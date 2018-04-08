@@ -41,6 +41,9 @@ class ManagementRequestsBackend(object):
     def instantiate_extracted_information_handler_class(self, request):
         raise NotImplementedError
 
+    def instantiate_error_handler_class(self, request):
+        raise NotImplementedError
+
     def process_request(self, request):
         if not self.is_processing_allowed(request):
             request.output = self.build_locked_for_processing_message(request)
@@ -57,9 +60,11 @@ class ManagementRequestsBackend(object):
                 os.environ,
                 ANSIBLE_LIBRARY=settings.WALDUR_ANSIBLE_COMMON['ANSIBLE_LIBRARY'],
                 ANSIBLE_HOST_KEY_CHECKING='False',
+                ANSIBLE_RETRY_FILES_ENABLED='False'
             )
             lines_post_processor_instance = self.instantiate_line_post_processor_class(request)
             extracted_information_handler = self.instantiate_extracted_information_handler_class(request)
+            error_handler = self.instantiate_error_handler_class(request)
             try:
                 for output_line in self.process_output_iterator(command, env):
                     request.output += output_line
@@ -67,6 +72,7 @@ class ManagementRequestsBackend(object):
                     lines_post_processor_instance.post_process_line(output_line)
             except subprocess.CalledProcessError as e:
                 logger.info('Failed to execute command "%s".', command_str)
+                error_handler.handle_error(request, lines_post_processor_instance)
                 six.reraise(exceptions.AnsibleBackendError, e)
             else:
                 logger.info('Command "%s" was successfully executed.', command_str)

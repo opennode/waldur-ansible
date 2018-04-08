@@ -72,11 +72,11 @@ class JupyterHubManagementService(object):
             if persisted_oauth_config:
                 incoming_oauth_config = incoming_validated_data.get('jupyter_hub_oauth_config')
                 return persisted_oauth_config.type != incoming_oauth_config.get('type') \
-                       or persisted_oauth_config.oauth_callback_url != incoming_oauth_config.get('oauth_callback_url') \
-                       or persisted_oauth_config.client_id != incoming_oauth_config.get('client_id') \
-                       or persisted_oauth_config.client_secret != incoming_oauth_config.get('client_secret') \
-                       or persisted_oauth_config.tenant_id != incoming_oauth_config.get('tenant_id') \
-                       or persisted_oauth_config.gitlab_host != incoming_oauth_config.get('gitlab_host')
+                    or persisted_oauth_config.oauth_callback_url != incoming_oauth_config.get('oauth_callback_url') \
+                    or persisted_oauth_config.client_id != incoming_oauth_config.get('client_id') \
+                    or persisted_oauth_config.client_secret != incoming_oauth_config.get('client_secret') \
+                    or persisted_oauth_config.tenant_id != incoming_oauth_config.get('tenant_id') \
+                    or persisted_oauth_config.gitlab_host != incoming_oauth_config.get('gitlab_host')
         else:
             return True
 

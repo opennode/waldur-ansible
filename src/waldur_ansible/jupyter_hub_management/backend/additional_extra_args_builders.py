@@ -9,12 +9,14 @@ def build_virtual_env_extra_args(jupyter_hub_virtual_env_request):
 
 def build_delete_jupyter_hub_extra_args(delete_jupyter_hub_request):
     return dict(
-        all_jupyterhub_users=map(lambda u: u.username, delete_jupyter_hub_request.jupyter_hub_management.jupyter_hub_users.all())
+        all_jupyterhub_users=map(lambda u: u.username, delete_jupyter_hub_request.jupyter_hub_management.jupyter_hub_users.all()),
+        first_admin_username=delete_jupyter_hub_request.jupyter_hub_management.get_admin_users()[0].username
     )
 
 
 def build_sync_config_extra_args(sync_config_request):
-    def user_password_pair_builder(user): return dict(username=user.username, password=user.password)
+    def user_password_pair_builder(user):
+        return dict(username=user.username, password=user.password)
 
     persisted_oauth_config = sync_config_request.jupyter_hub_management.jupyter_hub_oauth_config
 

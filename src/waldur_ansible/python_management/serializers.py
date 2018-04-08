@@ -104,19 +104,19 @@ class PythonManagementDeleteVirtualEnvRequestSerializer(PythonManagementRequestM
 
 
 class PythonManagementSynchronizeRequestSerializer(  # PermissionFieldFilteringMixin,
-    PythonManagementRequestMixin):
+        PythonManagementRequestMixin):
     libraries_to_install = core_serializers.JSONField(default={})
     libraries_to_remove = core_serializers.JSONField(default={})
 
     class Meta(PythonManagementRequestMixin.Meta):
         model = models.PythonManagementSynchronizeRequest
         fields = PythonManagementRequestMixin.Meta.fields \
-                 + ('libraries_to_install', 'libraries_to_remove', 'virtual_env_name')
+            + ('libraries_to_install', 'libraries_to_remove', 'virtual_env_name')
 
 
 class PythonManagementSerializer(
-    common_serializers.BaseApplicationSerializer,
-    structure_serializers.PermissionFieldFilteringMixin):
+        common_serializers.BaseApplicationSerializer,
+        structure_serializers.PermissionFieldFilteringMixin):
     REQUEST_IN_PROGRESS_STATES = (core_models.StateMixin.States.CREATION_SCHEDULED, core_models.StateMixin.States.CREATING)
 
     state = serializers.SerializerMethodField()
@@ -160,6 +160,12 @@ class PythonManagementSerializer(
         if initialize_request and self.is_in_progress_or_errored(initialize_request):
             return [self.build_state(initialize_request)]
 
+        states.extend(self.get_request_state(
+            utils.execute_safely(lambda: models.PythonManagementDeleteRequest.objects.filter(python_management=python_management).latest('id'))))
+        states.extend(
+            self.get_request_state(
+                utils.execute_safely(
+                    lambda: models.PythonManagementDeleteVirtualEnvRequest.objects.filter(python_management=python_management).latest('id'))))
         states.extend(self.build_search_requests_states(python_management))
         states.extend(self.build_states_from_last_group_of_the_request(python_management, models.PythonManagementSynchronizeRequest))
 
@@ -182,7 +188,7 @@ class PythonManagementSerializer(
             self.get_request_state(
                 utils.execute_safely(
                     lambda: models.PythonManagementFindVirtualEnvsRequest.objects
-                        .filter(python_management=python_management).latest('id'))))
+                    .filter(python_management=python_management).latest('id'))))
         states.extend(self.build_states_from_last_group_of_the_request(python_management, models.PythonManagementFindInstalledLibrariesRequest))
         return states
 
@@ -216,7 +222,7 @@ class PythonManagementSerializer(
 
     def is_in_progress_or_errored(self, request):
         return request.state in PythonManagementSerializer.REQUEST_IN_PROGRESS_STATES \
-               or request.state == core_models.StateMixin.States.ERRED
+            or request.state == core_models.StateMixin.States.ERRED
 
     def build_state(self, request, state=None):
         request_state = state if state else request
@@ -258,8 +264,8 @@ class PythonManagementSerializer(
 
 
 class CachedRepositoryPythonLibrarySerializer(
-    core_serializers.AugmentedSerializerMixin,
-    serializers.HyperlinkedModelSerializer):
+        core_serializers.AugmentedSerializerMixin,
+        serializers.HyperlinkedModelSerializer):
     class Meta(object):
         model = models.CachedRepositoryPythonLibrary
         fields = ('name', 'uuid')

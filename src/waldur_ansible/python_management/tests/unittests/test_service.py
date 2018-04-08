@@ -11,7 +11,7 @@ class PythonManagementServiceTest(TestCase):
 
     def test_identifies_removed_virtual_envs(self):
         virtual_env = factories.VirtualEnvironmentFactory(name='first-virt-env', python_management=self.fixture.python_management)
-        library = factories.InstalledLibraryFactory(name='lib1', version='11', virtual_environment=virtual_env)
+        factories.InstalledLibraryFactory(name='lib1', version='11', virtual_environment=virtual_env)
         persisted_virtual_envs = [virtual_env]
 
         transient_virtual_envs = []
@@ -120,7 +120,7 @@ class PythonManagementServiceTest(TestCase):
     def test_update_possible_when_not_processing(self):
         python_management = self.fixture.python_management
         with patch('waldur_ansible.python_management.python_management_service.executors.PythonManagementRequestExecutor.execute'), \
-             patch('waldur_ansible.python_management.python_management_service.PythonManagementService.create_or_refuse_requests') as create_or_refuse_requests:
+                patch('waldur_ansible.python_management.python_management_service.PythonManagementService.create_or_refuse_requests') as create_or_refuse_requests:
             create_or_refuse_requests.return_value = []
             python_management_service.PythonManagementService().schedule_virtual_environments_update([], python_management)
             create_or_refuse_requests.assert_called_once()

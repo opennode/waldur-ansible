@@ -4,7 +4,7 @@ from django.conf import settings
 from waldur_ansible.common import backend as common_backend
 from waldur_ansible.python_management import models, constants, executors
 
-from . import output_lines_post_processors, locking_service, extracted_information_handlers, additional_extra_args_builders
+from . import output_lines_post_processors, locking_service, extracted_information_handlers, additional_extra_args_builders, error_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +42,17 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
         models.PythonManagementSynchronizeRequest: extracted_information_handlers.InstalledLibrariesExtractedInformationHandler,
         models.PythonManagementFindVirtualEnvsRequest: extracted_information_handlers.PythonManagementFindVirtualEnvsRequestExtractedInformationHandler,
         models.PythonManagementFindInstalledLibrariesRequest: extracted_information_handlers.InstalledLibrariesExtractedInformationHandler,
-        models.PythonManagementDeleteVirtualEnvRequest: extracted_information_handlers.NullExtractedInformationHandler,
+        models.PythonManagementDeleteVirtualEnvRequest: extracted_information_handlers.PythonManagementDeleteVirtualEnvExtractedInformationHandler,
         models.PythonManagementDeleteRequest: extracted_information_handlers.PythonManagementDeletionRequestExtractedInformationHandler,
+    }
+
+    REQUEST_TYPES_ERROR_HANDLERS_CORRESPONDENCE = {
+        models.PythonManagementInitializeRequest: error_handlers.NullErrorHandler,
+        models.PythonManagementSynchronizeRequest: error_handlers.NullErrorHandler,
+        models.PythonManagementFindVirtualEnvsRequest: error_handlers.NullErrorHandler,
+        models.PythonManagementFindInstalledLibrariesRequest: error_handlers.NullErrorHandler,
+        models.PythonManagementDeleteVirtualEnvRequest: error_handlers.NullErrorHandler,
+        models.PythonManagementDeleteRequest: error_handlers.DeleteRequestErrorHandler,
     }
 
     LOCKED_FOR_PROCESSING = 'Whole environment or the particular virutal environnment is now being processed, request cannot be executed!'
@@ -65,8 +74,8 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
 
     def get_playbook_path(self, request):
         return settings.WALDUR_PYTHON_MANAGEMENT.get('PYTHON_MANAGEMENT_PLAYBOOKS_DIRECTORY') \
-               + PythonManagementBackend.REQUEST_TYPES_PLAYBOOKS_CORRESPONDENCE.get(type(request)) \
-               + '.yml'
+            + PythonManagementBackend.REQUEST_TYPES_PLAYBOOKS_CORRESPONDENCE.get(type(request)) \
+            + '.yml'
 
     def get_user(self, request):
         return request.python_management.user
@@ -74,7 +83,7 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
     def build_additional_extra_vars(self, request):
         python_management = request.python_management
         extra_vars = dict(
-            instance_public_ip=python_management.instance.external_ips[0],
+            instance_public_ip=python_management.instance.external_ips[0] if python_management.instance else None,
             virtual_envs_dir_path=python_management.virtual_envs_dir_path,
             default_system_user=python_management.system_user,
         )
@@ -93,6 +102,10 @@ class PythonManagementBackend(common_backend.ManagementRequestsBackend):
     def instantiate_extracted_information_handler_class(self, request):
         extracted_information_handler_class = PythonManagementBackend.REQUEST_TYPES_HANDLERS_CORRESPONDENCE \
             .get(type(request))
+        return extracted_information_handler_class()
+
+    def instantiate_error_handler_class(self, request):
+        extracted_information_handler_class = PythonManagementBackend.REQUEST_TYPES_ERROR_HANDLERS_CORRESPONDENCE.get(type(request))
         return extracted_information_handler_class()
 
 
