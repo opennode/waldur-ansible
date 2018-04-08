@@ -1,5 +1,6 @@
 import logging
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import decorators, response
 from rest_framework.viewsets import GenericViewSet
 
@@ -7,7 +8,7 @@ from waldur_ansible.common import serializers as common_serializers
 from waldur_ansible.jupyter_hub_management import models as jupyter_hub_models
 
 from waldur_core.core import views as core_views, managers as core_managers, mixins as core_mixins
-from waldur_core.structure import serializers as core_structure_serializers
+from waldur_core.structure import serializers as core_structure_serializers, filters as structure_filters
 from . import models, serializers, executors, pip_service, python_management_service, utils
 
 python_management_requests_models = [models.PythonManagementInitializeRequest,
@@ -26,6 +27,8 @@ class PythonManagementViewSet(core_mixins.AsyncExecutor, core_views.ActionsViewS
     serializer_class = serializers.PythonManagementSerializer
     python_management_request_executor = executors.PythonManagementRequestExecutor
     service = python_management_service.PythonManagementService()
+
+    filter_backends = (structure_filters.GenericRoleFilter, DjangoFilterBackend)
 
     def retrieve(self, request, *args, **kwargs):
         python_management = self.get_object()

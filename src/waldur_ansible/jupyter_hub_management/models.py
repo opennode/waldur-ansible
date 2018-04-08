@@ -40,7 +40,7 @@ class JupyterHubManagement(common_models.UuidStrMixin,
                            TimeStampedModel,
                            common_models.ApplicationModel):
     user = models.ForeignKey(User, related_name='+')
-    python_management = models.ForeignKey(python_management_models.PythonManagement, related_name='+')
+    python_management = models.ForeignKey(python_management_models.PythonManagement, related_name='jupyter_hub_management')
 
     session_time_to_live_hours = models.IntegerField(default=24)
     jupyter_hub_oauth_config = models.OneToOneField(

@@ -1,6 +1,6 @@
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
-from rest_framework.status import HTTP_202_ACCEPTED, HTTP_423_LOCKED
+from rest_framework.status import HTTP_202_ACCEPTED, HTTP_423_LOCKED, HTTP_412_PRECONDITION_FAILED
 from waldur_ansible.common import cache_utils
 from waldur_ansible.python_management.backend import locking_service
 
@@ -28,6 +28,8 @@ class PythonManagementService(object):
             status=HTTP_423_LOCKED)
 
     def schedule_python_management_removal(self, persisted_python_management):
+        if persisted_python_management.jupyter_hub_management.all():
+            raise APIException(code=HTTP_412_PRECONDITION_FAILED)
         delete_request = models.PythonManagementDeleteRequest(python_management=persisted_python_management)
 
         if not locking_service.PythonManagementBackendLockingService.is_processing_allowed(delete_request):
