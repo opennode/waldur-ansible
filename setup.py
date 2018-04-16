@@ -9,8 +9,8 @@ tests_requires = [
 ]
 
 install_requires = [
-    'waldur-core>=0.151.0',
-    'waldur-openstack>=0.38.2',
+    'waldur-core>=0.157.4',
+    'waldur-openstack>=0.41.3',
     'passlib>=1.7.0',
 ]
 
