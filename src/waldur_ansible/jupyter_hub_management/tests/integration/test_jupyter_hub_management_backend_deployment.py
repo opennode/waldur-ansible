@@ -27,7 +27,7 @@ class PythonManagementIntegrationTest(TestCase):
     @override_settings()
     def test_jupyter_hub_initialization(self):
         self.prepare_environment()
-        
+
         ubuntu_container = Ubuntu1604Container()
         container_https_port = "443/tcp"
         ubuntu_container.bind_port(container_https_port, "4444")
