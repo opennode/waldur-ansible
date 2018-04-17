@@ -1,6 +1,7 @@
 FROM xenial-server-cloudimg
 
-#setting up systemd
+# setting up systemd
+# the solution is taken from here https://github.com/solita/docker-systemd
 ENV container docker
 
 RUN find /etc/systemd/system \

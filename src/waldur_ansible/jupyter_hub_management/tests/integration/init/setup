@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 
+# the solution is taken from here https://github.com/solita/docker-systemd
 if nsenter --mount=/host/proc/1/ns/mnt -- mount | grep /sys/fs/cgroup/systemd >/dev/null 2>&1; then
   echo 'The systemd cgroup hierarchy is already mounted at /sys/fs/cgroup/systemd.'
 else
