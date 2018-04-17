@@ -35,10 +35,6 @@ ENV LC_ALL=C
 ENV DEBIAN_FRONTEND=noninteractive
 RUN dpkg-reconfigure openssh-server
 
-#setting timezone
-#ENV TZ=Europe/Helsinki
-#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 

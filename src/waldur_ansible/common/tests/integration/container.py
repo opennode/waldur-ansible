@@ -1,10 +1,4 @@
-from time import sleep
-
 import docker
-from waldur_ansible.common.tests.integration.exceptions import TimeoutException
-
-MAX_TRIES = 4
-SLEEP_TIME = 1
 
 
 class DockerContainer(object):
@@ -48,18 +42,3 @@ class DockerContainer(object):
 
     def get_contaner(self):
         return self.container
-
-    def wait_to_start_internal(self, container_started_condition_function):
-        exception = None
-        print("Waiting for container to start...")
-        for i in range(0, MAX_TRIES):
-            try:
-                if container_started_condition_function():
-                    return
-                else:
-                    continue
-            except Exception as e:
-                exception = e
-            sleep(SLEEP_TIME)
-        raise TimeoutException(
-            "Wait time exceeded %s sec. Exception %s" % (MAX_TRIES * SLEEP_TIME, exception))
