@@ -1,0 +1,6 @@
+#!/bin/bash
+
+wget -nc https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-root.tar.gz
+cat xenial-server-cloudimg-amd64-root.tar.gz | docker import - xenial-server-cloudimg
+docker build --rm --tag=integration-test-image:ubuntu1604 .
+docker run --rm --privileged -v /:/host integration-test-image:ubuntu1604 /bin/bash -c setup

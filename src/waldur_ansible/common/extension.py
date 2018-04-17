@@ -11,6 +11,7 @@ class AnsibleCommonExtension(WaldurExtension):
             'PUBLIC_KEY_UUID': 'Corresponding public key should be stored in the database. Specify here its UUID.',
             'ANSIBLE_REQUEST_TIMEOUT': 3600,
             'ANSIBLE_LIBRARY': '/usr/share/ansible-waldur/',
+            'REMOTE_VM_SSH_PORT': '22',
         }
 
     @staticmethod

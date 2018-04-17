@@ -6,6 +6,7 @@ tests_requires = [
     'ddt>=1.0.0',
     'factory_boy==2.4.1',
     'mock>=1.0.1',
+    'docker==3.2.1',
 ]
 
 install_requires = [
