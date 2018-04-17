@@ -7,9 +7,9 @@ import six
 from django.conf import settings
 
 from waldur_ansible.common import exceptions
-from waldur_ansible.common.utils import subprocess_output_iterator
-
 from waldur_core.core.views import RefreshTokenMixin
+
+from . import utils
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class ManagementRequestsBackend(object):
             extracted_information_handler = self.instantiate_extracted_information_handler_class(request)
             error_handler = self.instantiate_error_handler_class(request)
             try:
-                for output_line in subprocess_output_iterator(command, env):
+                for output_line in utils.subprocess_output_iterator(command, env):
                     request.output += output_line
                     request.save(update_fields=['output'])
                     lines_post_processor_instance.post_process_line(output_line)

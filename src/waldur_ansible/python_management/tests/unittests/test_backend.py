@@ -31,13 +31,13 @@ class PythonManagementServiceTest(TestCase):
             backend_under_test.process_python_management_request(init_request)
             mocked_execute.assert_called_once()
 
-    @override_settings(WALDUR_ANSIBLE_COMMON={'ANSIBLE_LIBRARY': '/ansible_playbooks/path'})
+    @override_settings(WALDUR_ANSIBLE_COMMON={'ANSIBLE_LIBRARY': '/ansible_playbooks/path', 'REMOTE_VM_SSH_PORT': '22'})
     def test_process_request(self):
         backend = python_management_backend.PythonManagementBackend()
         with patch(self.module_path + 'PythonManagementBackend.build_command') as build_command, \
                 patch(self.module_path + 'PythonManagementBackend.instantiate_extracted_information_handler_class') as intantiate_extracted_information_handler_class, \
                 patch(self.module_path + 'PythonManagementBackend.instantiate_line_post_processor_class') as instantiate_line_post_processor_class, \
-                patch(self.module_path + 'PythonManagementBackend.process_output_iterator') as process_output_iterator, \
+                patch('waldur_ansible.common.backend.utils.subprocess_output_iterator') as process_output_iterator, \
                 patch(self.module_path + 'extracted_information_handlers.NullExtractedInformationHandler') as mock_extracted_information_handler, \
                 patch(self.module_path + 'output_lines_post_processors.NullOutputLinesPostProcessor') as lines_post_processor_instance, \
                 patch(self.module_path + 'locking_service.PythonManagementBackendLockingService') as locking_service:
