@@ -1,28 +1,32 @@
-import pytest
 import requests
 import urllib3
 
-from mock import patch
+from unittest import skipUnless
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, tag
+from mock import patch
 
 from waldur_ansible.common.tests.integration.ubuntu1604_container import Ubuntu1604Container, CONTAINER_SSH_PORT_ON_HOST
+from waldur_ansible.common.tests.integration import integration_tests_config
 from waldur_ansible.jupyter_hub_management.tests import factories as jupyter_hub_factories, fixtures as jupyter_hub_fixtures
 from waldur_ansible.python_management.tests import factories as python_management_factories
 from waldur_openstack.openstack_tenant import models as openstack_tenant_models
 
 
-class PythonManagementIntegrationTest(TestCase):
+@skipUnless(integration_tests_config.integration_test_flag_provided(), integration_tests_config.SKIP_INTEGRATION_REASON)
+class JupyterHubManagementIntegrationTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        super(PythonManagementIntegrationTest, cls).setUpClass()
-        Ubuntu1604Container.build_image()
+        super(JupyterHubManagementIntegrationTest, cls).setUpClass()
+        # For some reason setUpClass gets called by Django test logic even if test is skipped
+        if integration_tests_config.integration_test_flag_provided():
+            Ubuntu1604Container.build_image()
 
     def setUp(self):
         self.fixture = jupyter_hub_fixtures.JupyterHubManagementLinuxPamFixture()
         self.module_path = "waldur_ansible.python_management.backend.python_management_backend."
 
-    @pytest.mark.integration
+    @tag(integration_tests_config.INTEGRATION_TEST)
     def test_jupyter_hub_initialization(self):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         waldur_ansible_common_settings = settings.WALDUR_ANSIBLE_COMMON.copy()
