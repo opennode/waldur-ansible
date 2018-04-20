@@ -13,6 +13,7 @@ from waldur_ansible.python_management.tests import factories as python_managemen
 from waldur_openstack.openstack_tenant import models as openstack_tenant_models
 
 
+@tag(integration_tests_config.INTEGRATION_TEST)
 @skipUnless(integration_tests_config.integration_test_flag_provided(), integration_tests_config.SKIP_INTEGRATION_REASON)
 class JupyterHubManagementIntegrationTest(TestCase):
     @classmethod
@@ -26,7 +27,6 @@ class JupyterHubManagementIntegrationTest(TestCase):
         self.fixture = jupyter_hub_fixtures.JupyterHubManagementLinuxPamFixture()
         self.module_path = "waldur_ansible.python_management.backend.python_management_backend."
 
-    @tag(integration_tests_config.INTEGRATION_TEST)
     def test_jupyter_hub_initialization(self):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         waldur_ansible_common_settings = settings.WALDUR_ANSIBLE_COMMON.copy()
