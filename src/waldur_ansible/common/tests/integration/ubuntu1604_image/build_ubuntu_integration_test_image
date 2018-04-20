@@ -10,4 +10,6 @@ if [ "$REBUILD_ARG" == "--rebuild" ] || [ "$(docker images -q integration-test-i
     docker build --rm --tag=integration-test-image:ubuntu1604 .
     docker run --rm --privileged -v /:/host integration-test-image:ubuntu1604 /bin/bash -c setup
 
+else
+    echo "Using already built integration-test-image:ubuntu1604 image"
 fi
