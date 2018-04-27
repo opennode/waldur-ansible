@@ -8,6 +8,7 @@ from mock import patch
 
 from waldur_ansible.common.tests.integration.ubuntu1604_container import Ubuntu1604Container, CONTAINER_SSH_PORT_ON_HOST
 from waldur_ansible.common.tests.integration import integration_tests_config
+from waldur_ansible.common.tests.integration.ubuntu1604_image import Ubuntu1604Image
 from waldur_ansible.jupyter_hub_management.tests import factories as jupyter_hub_factories, fixtures as jupyter_hub_fixtures
 from waldur_ansible.python_management.tests import factories as python_management_factories
 from waldur_openstack.openstack_tenant import models as openstack_tenant_models
@@ -16,12 +17,15 @@ from waldur_openstack.openstack_tenant import models as openstack_tenant_models
 @tag(integration_tests_config.INTEGRATION_TEST)
 @skipUnless(integration_tests_config.integration_test_flag_provided(), integration_tests_config.SKIP_INTEGRATION_REASON)
 class JupyterHubManagementIntegrationTest(TestCase):
+
+    UBUNTU_IMAGE = Ubuntu1604Image()
+
     @classmethod
     def setUpClass(cls):
         super(JupyterHubManagementIntegrationTest, cls).setUpClass()
         # For some reason setUpClass gets called by Django test logic even if test is skipped
         if integration_tests_config.integration_test_flag_provided():
-            Ubuntu1604Container.build_image()
+            JupyterHubManagementIntegrationTest.UBUNTU_IMAGE.build_image()
 
     def setUp(self):
         self.fixture = jupyter_hub_fixtures.JupyterHubManagementLinuxPamFixture()
@@ -31,7 +35,7 @@ class JupyterHubManagementIntegrationTest(TestCase):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         waldur_ansible_common_settings = settings.WALDUR_ANSIBLE_COMMON.copy()
         waldur_ansible_common_settings["REMOTE_VM_SSH_PORT"] = CONTAINER_SSH_PORT_ON_HOST
-        waldur_ansible_common_settings["PRIVATE_KEY_PATH"] = Ubuntu1604Container.get_private_key_path()
+        waldur_ansible_common_settings["PRIVATE_KEY_PATH"] = JupyterHubManagementIntegrationTest.UBUNTU_IMAGE.get_private_key_path()
 
         with self.settings(WALDUR_ANSIBLE_COMMON=waldur_ansible_common_settings):
             ubuntu_container = Ubuntu1604Container()
