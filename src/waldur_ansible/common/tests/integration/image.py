@@ -31,7 +31,9 @@ class DockerImage(object):
         return base_image_file_path
 
     def build_image_from_dockerfile(self):
-        docker.from_env().images.build(rm=True, path='%s/%s' % (os.path.dirname(os.path.abspath(__file__)), self.image_dir_name), tag=self.image_name)
+        _, result_stream = docker.from_env().images.build(rm=True, path='%s/%s' % (os.path.dirname(os.path.abspath(__file__)), self.image_dir_name), tag=self.image_name)
+        for chunk in result_stream:
+            print(chunk.get('stream', chunk))
 
     def image_exists(self):
         return docker.from_env().images.list(name=self.image_name)

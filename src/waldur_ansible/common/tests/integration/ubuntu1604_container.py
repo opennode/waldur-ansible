@@ -1,5 +1,3 @@
-import os
-
 from waldur_ansible.common.tests.integration.container import DockerContainer
 from waldur_ansible.common.tests.integration.ubuntu1604_image import Ubuntu1604Image
 
