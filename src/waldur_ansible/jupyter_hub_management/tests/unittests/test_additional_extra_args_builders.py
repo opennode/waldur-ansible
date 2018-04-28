@@ -6,7 +6,7 @@ from waldur_ansible.jupyter_hub_management.tests import factories, fixtures
 
 class JupyterHubManagementExtraArgsBuildersTest(TestCase):
     def setUp(self):
-        self.fixture = fixtures.JupyterHubManagementFixture()
+        self.fixture = fixtures.JupyterHubManagementOAuthFixture()
         self.jupyter_hub_management = self.fixture.jupyter_hub_management
         self.sync_request = factories.JupyterHubManagementSyncConfigurationRequestFactory(jupyter_hub_management=self.jupyter_hub_management)
 
