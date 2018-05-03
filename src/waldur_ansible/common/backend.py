@@ -75,7 +75,7 @@ class ManagementRequestsBackend(object):
                     lines_post_processor_instance.post_process_line(output_line)
             except subprocess.CalledProcessError as e:
                 logger.error('%s - failed to execute command "%s".', request, command_str)
-                logger.error('%s - Ansible error output: \n %s.', request, request.output)
+                logger.error('%s - Ansible request processing output: \n %s.', request, request.output)
                 error_handler.handle_error(request, lines_post_processor_instance)
                 six.reraise(exceptions.AnsibleBackendError, e)
             else:
