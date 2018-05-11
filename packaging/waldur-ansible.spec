@@ -7,7 +7,7 @@ License: MIT
 Url: http://waldur.com
 Source0: %{name}-%{version}.tar.gz
 
-Requires: waldur-core >= 0.1517.4
+Requires: waldur-core >= 0.157.4
 Requires: waldur-openstack >= 0.41.3
 Requires: python-passlib >= 1.7.0
 
