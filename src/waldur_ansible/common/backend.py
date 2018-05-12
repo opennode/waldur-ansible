@@ -9,6 +9,8 @@ from django.conf import settings
 from waldur_ansible.common import exceptions
 from waldur_core.core.views import RefreshTokenMixin
 
+from . import utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -60,18 +62,20 @@ class ManagementRequestsBackend(object):
                 os.environ,
                 ANSIBLE_LIBRARY=settings.WALDUR_ANSIBLE_COMMON['ANSIBLE_LIBRARY'],
                 ANSIBLE_HOST_KEY_CHECKING='False',
-                ANSIBLE_RETRY_FILES_ENABLED='False'
+                ANSIBLE_RETRY_FILES_ENABLED='False',
+                ANSIBLE_REMOTE_PORT=settings.WALDUR_ANSIBLE_COMMON['REMOTE_VM_SSH_PORT'],
             )
             lines_post_processor_instance = self.instantiate_line_post_processor_class(request)
             extracted_information_handler = self.instantiate_extracted_information_handler_class(request)
             error_handler = self.instantiate_error_handler_class(request)
             try:
-                for output_line in self.process_output_iterator(command, env):
+                for output_line in utils.subprocess_output_iterator(command, env):
                     request.output += output_line
                     request.save(update_fields=['output'])
                     lines_post_processor_instance.post_process_line(output_line)
             except subprocess.CalledProcessError as e:
-                logger.info('Failed to execute command "%s".', command_str)
+                logger.error('%s - failed to execute command "%s".', request, command_str)
+                logger.error('%s - Ansible request processing output: \n %s.', request, request.output)
                 error_handler.handle_error(request, lines_post_processor_instance)
                 six.reraise(exceptions.AnsibleBackendError, e)
             else:
@@ -79,15 +83,6 @@ class ManagementRequestsBackend(object):
                 extracted_information_handler.handle_extracted_information(request, lines_post_processor_instance)
         finally:
             self.handle_on_processing_finished(request)
-
-    def process_output_iterator(self, command, env):
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1, env=env)  # nosec
-        for stdout_line in iter(process.stdout.readline, ""):
-            yield stdout_line
-        process.stdout.close()
-        return_code = process.wait()
-        if return_code:
-            raise subprocess.CalledProcessError(return_code, command)
 
     def build_command(self, request):
         playbook_path = self.get_playbook_path(request)

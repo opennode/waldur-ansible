@@ -8,7 +8,7 @@ from waldur_ansible.python_management.tests import factories as python_managemen
 
 class JupyterHubManagementServiceTest(TestCase):
     def setUp(self):
-        self.fixture = fixtures.JupyterHubManagementFixture()
+        self.fixture = fixtures.JupyterHubManagementOAuthFixture()
 
     def test_issue_globalize_request(self):
         jupyter_hub_management = self.fixture.jupyter_hub_management

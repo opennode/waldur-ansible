@@ -6,18 +6,19 @@ tests_requires = [
     'ddt>=1.0.0',
     'factory_boy==2.4.1',
     'mock>=1.0.1',
+    'docker==3.2.1',
 ]
 
 install_requires = [
-    'waldur-core>=0.151.0',
-    'waldur-openstack>=0.38.2',
+    'waldur-core>=0.157.4',
+    'waldur-openstack>=0.41.3',
     'passlib>=1.7.0',
 ]
 
 
 setup(
     name='waldur-ansible',
-    version='0.5.2',
+    version='0.6.1',
     author='OpenNode Team',
     author_email='info@opennodecloud.com',
     url='https://waldur.com',

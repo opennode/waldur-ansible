@@ -16,5 +16,5 @@ class PythonManagementFixture(openstack_fixtures.OpenStackTenantFixture):
             virtual_envs_dir_path='my-virtual-envs',
             instance=instance,
             user=self.user,
-            system_user='debian',
+            system_user='ubuntu',
         )

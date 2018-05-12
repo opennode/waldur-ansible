@@ -6,9 +6,9 @@ from waldur_ansible.python_management.backend import extracted_information_handl
 from waldur_ansible.python_management.tests import factories as python_management_factories
 
 
-class PythonManagementServiceTest(TestCase):
+class JupyterHubManagementServiceTest(TestCase):
     def setUp(self):
-        self.fixture = fixtures.JupyterHubManagementFixture()
+        self.fixture = fixtures.JupyterHubManagementOAuthFixture()
 
     def test_delete_request_handler(self):
         extracted_information_handler = extracted_information_handlers.JupyterHubManagementDeleteExtractedInformationHandler()

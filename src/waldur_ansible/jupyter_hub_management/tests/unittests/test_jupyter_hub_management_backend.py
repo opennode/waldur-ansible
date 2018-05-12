@@ -8,7 +8,7 @@ from waldur_ansible.jupyter_hub_management.tests import factories, fixtures
 
 class JupyterHubManagementBackendTest(TestCase):
     def setUp(self):
-        self.fixture = fixtures.JupyterHubManagementFixture()
+        self.fixture = fixtures.JupyterHubManagementOAuthFixture()
         self.module_path = 'waldur_ansible.jupyter_hub_management.backend.backend.'
 
     def test_do_not_process_when_locked(self):
