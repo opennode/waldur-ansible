@@ -18,7 +18,7 @@ install_requires = [
 
 setup(
     name='waldur-ansible',
-    version='0.5.2',
+    version='0.6.1',
     author='OpenNode Team',
     author_email='info@opennodecloud.com',
     url='https://waldur.com',

@@ -1,7 +1,7 @@
 Name: waldur-ansible
 Summary: Ansible plugin for Waldur
 Group: Development/Libraries
-Version: 0.5.2
+Version: 0.6.1
 Release: 1.el7
 License: MIT
 Url: http://waldur.com
@@ -37,6 +37,9 @@ rm -rf %{buildroot}
 %{python_sitelib}/*
 
 %changelog
+* Sat May 12 2018 Jenkins <jenkins@opennodecloud.com> - 0.6.1-1.el7
+- New upstream release
+
 * Sun Apr 8 2018 Jenkins <jenkins@opennodecloud.com> - 0.5.2-1.el7
 - New upstream release
 
