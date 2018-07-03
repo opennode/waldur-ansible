@@ -80,8 +80,8 @@ class VirtualEnvMixin(models.Model):
 
 
 class PythonManagementSynchronizeRequest(VirtualEnvMixin, PythonManagementRequest):
-    libraries_to_install = core_fields.JSONField(default=[], help_text=_('List of libraries to install'), blank=True)
-    libraries_to_remove = core_fields.JSONField(default=[], help_text=_('List of libraries to remove'), blank=True)
+    libraries_to_install = core_fields.JSONField(default=list, help_text=_('List of libraries to install'), blank=True)
+    libraries_to_remove = core_fields.JSONField(default=list, help_text=_('List of libraries to remove'), blank=True)
     initialization_request = models.ForeignKey(PythonManagementInitializeRequest, related_name="sychronization_requests", null=True)
 
 
