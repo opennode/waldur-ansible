@@ -122,7 +122,7 @@ class JobSerializer(common_serializers.BaseApplicationSerializer,
     playbook_uuid = serializers.ReadOnlyField(source='playbook.uuid')
     playbook_image = serializers.FileField(source='playbook.image', read_only=True)
     playbook_description = serializers.ReadOnlyField(source='playbook.description')
-    arguments = core_serializers.JSONField(default=dict)
+    arguments = serializers.JSONField(default=dict)
     state = serializers.SerializerMethodField()
     tag = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
