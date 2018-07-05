@@ -101,7 +101,7 @@ class Job(core_models.UuidMixin,
     service_project_link = models.ForeignKey(openstack_models.OpenStackTenantServiceProjectLink, related_name='+')
     subnet = models.ForeignKey(openstack_models.SubNet, related_name='+')
     playbook = models.ForeignKey(Playbook, related_name='jobs')
-    arguments = core_fields.JSONField(default={}, blank=True, null=True)
+    arguments = core_fields.JSONField(default=dict, blank=True, null=True)
     output = models.TextField(blank=True)
 
     @staticmethod

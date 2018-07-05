@@ -10,15 +10,15 @@ tests_requires = [
 ]
 
 install_requires = [
-    'waldur-core>=0.157.4',
-    'waldur-openstack>=0.41.3',
+    'waldur-core>=0.161.4',
+    'waldur-openstack>=0.43.4',
     'passlib>=1.7.0',
 ]
 
 
 setup(
     name='waldur-ansible',
-    version='0.6.1',
+    version='0.6.2',
     author='OpenNode Team',
     author_email='info@opennodecloud.com',
     url='https://waldur.com',

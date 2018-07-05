@@ -1,14 +1,14 @@
 Name: waldur-ansible
 Summary: Ansible plugin for Waldur
 Group: Development/Libraries
-Version: 0.6.1
+Version: 0.6.2
 Release: 1.el7
 License: MIT
 Url: http://waldur.com
 Source0: %{name}-%{version}.tar.gz
 
-Requires: waldur-core >= 0.157.4
-Requires: waldur-openstack >= 0.41.3
+Requires: waldur-core >= 0.161.4
+Requires: waldur-openstack >= 0.43.4
 Requires: python-passlib >= 1.7.0
 
 BuildArch: noarch
@@ -37,6 +37,9 @@ rm -rf %{buildroot}
 %{python_sitelib}/*
 
 %changelog
+* Thu Jul 5 2018 Jenkins <jenkins@opennodecloud.com> - 0.6.2-1.el7
+- New upstream release
+
 * Sat May 12 2018 Jenkins <jenkins@opennodecloud.com> - 0.6.1-1.el7
 - New upstream release
 
