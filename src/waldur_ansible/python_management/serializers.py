@@ -104,8 +104,8 @@ class PythonManagementDeleteVirtualEnvRequestSerializer(PythonManagementRequestM
 
 
 class PythonManagementSynchronizeRequestSerializer(PythonManagementRequestMixin):
-    libraries_to_install = core_serializers.JSONField(default=dict)
-    libraries_to_remove = core_serializers.JSONField(default=dict)
+    libraries_to_install = serializers.JSONField(default=dict)
+    libraries_to_remove = serializers.JSONField(default=dict)
 
     class Meta(PythonManagementRequestMixin.Meta):
         model = models.PythonManagementSynchronizeRequest
